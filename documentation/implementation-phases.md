@@ -2,7 +2,7 @@
 document: Fases de implementacion
 project: Devsu Microservicios Bancarios
 author: JMVELEZ
-version: 1.5
+version: 1.6
 status: Roadmap de desarrollo
 related:
   - instructions.md
@@ -14,7 +14,7 @@ related:
 
 Hitos cortos y verificables. Spec: [instructions.md](instructions.md) | BD: [data-model.md](data-model.md) | Checklist: [evaluation.md](evaluation.md)
 
-**Reglas:** una fase a la vez; sin modulo `shared`; sin REST entre MS; sin JWT; sin Flyway (solo `BaseDatos.sql`); sin seed SQL; envelope ApiResponse siempre; F3 message exacto `"Saldo no disponible"`. No inventar endpoints/campos — ver [instructions §4](instructions.md#4-contrato-api).
+**Reglas:** una fase a la vez; sin modulo `shared`; sin REST entre MS; sin JWT; sin Flyway (solo `BaseDatos.sql`); sin seed SQL; envelope ApiResponse siempre; F3 message exacto `"Saldo no disponible"`. No inventar endpoints/campos ï¿½ ver [instructions ï¿½4](instructions.md#4-contrato-api).
 
 ```mermaid
 flowchart TD
@@ -36,7 +36,7 @@ flowchart TD
 
 ---
 
-## F0 — Documentacion (pre-codigo) [x]
+## F0 ï¿½ Documentacion (pre-codigo) [x]
 
 - [x] Contrato API, ADR, data-model, evaluation alineados
 - [x] README raiz y `.gitignore`
@@ -44,29 +44,29 @@ flowchart TD
 
 ---
 
-## F1 — Monorepo Gradle vacio
+## F1 ï¿½ Monorepo Maven vacio
 
 Dos apps Spring Boot 4 compilan y arrancan (:8081 / :8082). Paquetes `com.devsu.client` / `com.devsu.account` con capas vacias.
 
-- [ ] `./gradlew build` OK
-- [ ] `:client-service:bootRun` :8081
-- [ ] `:account-service:bootRun` :8082
+- [x] `./mvnw clean verify` OK
+- [x] `-pl client-service spring-boot:run` :8081
+- [x] `-pl account-service spring-boot:run` :8082
 
 ---
 
-## F2 — Plataforma API (ambos servicios)
+## F2 ï¿½ Plataforma API (ambos servicios)
 
 `ApiResponse`, `PageResponse`, `CorrelationIdFilter`, `GlobalExceptionHandler`, logback consola + JSON.
 
-- [ ] correlationId en header, body y logs
-- [ ] Excepcion prueba -> envelope + HTTP correcto
-- [ ] MDC.clear() sin fugas
+- [x] correlationId en header, body y logs
+- [x] Excepcion prueba -> envelope + HTTP correcto
+- [x] MDC.clear() sin fugas
 
-Ref: [instructions §4.2-4.4](instructions.md#42-envelope-y-http-adr-11)
+Ref: [instructions ï¿½4.2-4.4](instructions.md#42-envelope-y-http-adr-11)
 
 ---
 
-## F3 — Docker + BaseDatos.sql
+## F3 ï¿½ Docker + BaseDatos.sql
 
 `.env.example`, `docker-compose.yml`, `BaseDatos.sql`, prometheus/grafana.
 
@@ -75,7 +75,7 @@ Ref: [instructions §4.2-4.4](instructions.md#42-envelope-y-http-adr-11)
 
 ---
 
-## F4 — CRUD Cliente (sin Kafka)
+## F4 ï¿½ CRUD Cliente (sin Kafka)
 
 JPA JOINED, CRUD `/api/clientes`, BCrypt, paginacion, DELETE logico.
 
@@ -83,22 +83,22 @@ JPA JOINED, CRUD `/api/clientes`, BCrypt, paginacion, DELETE logico.
 - [ ] contrasena hasheada en BD
 - [ ] Caso 1 Anexo A
 
-Ref: [instructions §5](instructions.md#5-dtos-y-recursos)
+Ref: [instructions ï¿½5](instructions.md#5-dtos-y-recursos)
 
 ---
 
-## F5 — Outbox + Kafka publish
+## F5 ï¿½ Outbox + Kafka publish
 
 Outbox en misma TX; publisher @Scheduled 3s; topic `devsu.client.events`.
 
 - [ ] Mensaje en topic tras POST/PUT/DELETE
 - [ ] correlationId en outbox y header Kafka
 
-Ref: [instructions §2](instructions.md#2-kafka--outbox) | [data-model](data-model.md)
+Ref: [instructions ï¿½2](instructions.md#2-kafka--outbox) | [data-model](data-model.md)
 
 ---
 
-## F6 — Consumer + cliente_referencia
+## F6 ï¿½ Consumer + cliente_referencia
 
 KafkaListener, UPSERT `cliente_referencia`, idempotencia `processed_event`.
 
@@ -108,7 +108,7 @@ KafkaListener, UPSERT `cliente_referencia`, idempotencia `processed_event`.
 
 ---
 
-## F7 — CRU Cuentas
+## F7 ï¿½ CRU Cuentas
 
 POST/GET/PUT `/api/cuentas`; validar cliente_referencia activo.
 
@@ -117,7 +117,7 @@ POST/GET/PUT `/api/cuentas`; validar cliente_referencia activo.
 
 ---
 
-## F8 — Movimientos (F2 + F3 del reto)
+## F8 ï¿½ Movimientos (F2 + F3 del reto)
 
 POST/GET `/api/movimientos`; F3: 422, `SALDO_NO_DISPONIBLE`, `"Saldo no disponible"`.
 
@@ -127,7 +127,7 @@ POST/GET `/api/movimientos`; F3: 422, `SALDO_NO_DISPONIBLE`, `"Saldo no disponib
 
 ---
 
-## F9 — Reportes (F4 del reto)
+## F9 ï¿½ Reportes (F4 del reto)
 
 GET `/api/reportes` con fechaDesde, fechaHasta, cliente.
 
@@ -136,7 +136,7 @@ GET `/api/reportes` con fechaDesde, fechaHasta, cliente.
 
 ---
 
-## F10 — Observabilidad Docker full
+## F10 ï¿½ Observabilidad Docker full
 
 Dockerfiles, apps en compose, `/actuator/prometheus`.
 
@@ -145,15 +145,15 @@ Dockerfiles, apps en compose, `/actuator/prometheus`.
 
 ---
 
-## F11 — Pruebas
+## F11 ï¿½ Pruebas
 
 Min. 1 test unitario Cliente; bonus Testcontainers.
 
-- [ ] `./gradlew test` verde
+- [ ] `./mvnw test` verde
 
 ---
 
-## F12 — Entrega final
+## F12 ï¿½ Entrega final
 
 Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 
@@ -168,6 +168,8 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | Fase | Estado |
 |---|---|
 | F0 | [x] Completo |
-| F1-F12 | [ ] Pendiente |
+| F1 | [x] Completo |
+| F2 | [x] Completo |
+| F3-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

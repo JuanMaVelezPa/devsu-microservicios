@@ -12,16 +12,24 @@
 logs/
 *.log
 
-# --- Gradle / Java build ---
-.gradle/
-build/
-**/build/
+# --- Maven / Java build ---
+target/
+**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+.mvn/timing.properties
 out/
 *.class
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.ear
+
+# --- Artefactos build legacy (si quedan restos locales) ---
+.gradle/
+build/
+**/build/
 
 # --- IDE ---
 .idea/

@@ -89,7 +89,7 @@ Referencia de datos: Anexo A en [instructions.md](instructions.md)
 
 Referencia: tabla ADR y secciones 1-6 en [instructions.md](instructions.md)
 
-- [ ] Java 25 + Spring Boot 4 + Gradle
+- [ ] Java 25 + Spring Boot 4 + Maven
 - [ ] PostgreSQL: 1 instancia, schemas `client` + `account`
 - [ ] ADR-13: .env.example + .gitignore + Docker Compose con variables (implementacion)
 - [ ] Kafka en Docker Compose

@@ -1,4 +1,4 @@
-# Devsu — Microservicios bancarios
+# Devsu ï¿½ Microservicios bancarios
 
 Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunicacion **asincrona** (Kafka + Transactional Outbox) y despliegue en Docker. Enfoque **Clean Architecture** y patrones habituales en entornos financieros (consistencia eventual, trazabilidad, separacion de dominios).
 
@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F0 completada — definicion y documentacion. Implementacion en fases F1–F12. |
+| **Estado** | F2 completada ï¿½ Maven multi-mï¿½dulo, plataforma API. Implementaciï¿½n en fases F3ï¿½F12. |
 
 ---
 
@@ -30,7 +30,7 @@ Documentacion tecnica: [documentation/instructions.md](documentation/instruction
 |---|---|
 | Lenguaje | Java 25 |
 | Framework | Spring Boot 4 |
-| Build | Gradle (monorepo) |
+| Build | Maven (multi-mï¿½dulo) |
 | Persistencia | PostgreSQL, JPA/Hibernate |
 | Mensajeria | Apache Kafka + Transactional Outbox |
 | API | REST, envelope `ApiResponse`, OpenAPI (springdoc) |
@@ -45,19 +45,29 @@ Documentacion tecnica: [documentation/instructions.md](documentation/instruction
 
 ```
 Devsu/
+??? pom.xml
+??? mvnw / mvnw.cmd
+??? .mvn/wrapper/
 ??? README.md
 ??? .gitignore
 ??? documentation/
 ??? client-service/           # (F1+)
-??? account-service/            # (F1+)
-??? docker-compose.yml          # (F3+)
-??? BaseDatos.sql               # (F3+)
-??? .env.example                # (F3+)
-??? infra/                      # (F3+)
-??? postman/                    # (F12)
+??? account-service/          # (F1+)
+??? docker-compose.yml        # (F3+)
+??? BaseDatos.sql             # (F3+)
+??? .env.example              # (F3+)
+??? infra/                    # (F3+)
+??? postman/                  # (F12)
 ```
 
 ---
+
+## Como compilar y probar
+
+```bash
+./mvnw clean verify          # compilar + tests (ambos servicios)
+./mvnw test                  # solo tests
+```
 
 ## Como ejecutar (cuando este implementado)
 
@@ -66,11 +76,11 @@ Devsu/
 ```bash
 copy .env.example .env
 docker compose up -d
-./gradlew :client-service:bootRun    # :8081
-./gradlew :account-service:bootRun   # :8082
+./mvnw -pl client-service spring-boot:run    # :8081
+./mvnw -pl account-service spring-boot:run   # :8082
 ```
 
-Flujo de prueba Casos 1–5: [documentation/instructions.md](documentation/instructions.md).
+Flujo de prueba Casos 1ï¿½5: [documentation/instructions.md](documentation/instructions.md).
 
 ---
 
@@ -80,7 +90,7 @@ Flujo de prueba Casos 1–5: [documentation/instructions.md](documentation/instruc
 |---|---|
 | [documentation/instructions.md](documentation/instructions.md) | ADR, arquitectura, contrato API, Anexo A |
 | [documentation/data-model.md](documentation/data-model.md) | Modelo ER y SQL |
-| [documentation/implementation-phases.md](documentation/implementation-phases.md) | Roadmap F0–F12 |
+| [documentation/implementation-phases.md](documentation/implementation-phases.md) | Roadmap F0ï¿½F12 |
 | [documentation/evaluation.md](documentation/evaluation.md) | Checklist pre-entrega |
 
 ---
@@ -101,4 +111,4 @@ La carpeta `documentation/` documenta el proceso y las decisiones para la entrev
 
 ---
 
-*Proyecto en construccion — sector financiero / Java backend.*
+*Proyecto en construccion ï¿½ sector financiero / Java backend.*

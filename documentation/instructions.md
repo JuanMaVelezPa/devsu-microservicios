@@ -2,7 +2,7 @@
 document: Arquitectura y Decisiones del Proyecto
 project: Devsu Microservicios Bancarios
 author: JMVELEZ
-version: 3.9
+version: 4.0
 status: Living document
 related:
   - evaluation.md
@@ -30,7 +30,7 @@ Reto Devsu: **2 microservicios** bancarios, API REST, JPA, Docker, comunicacion 
 | ID | Decision | Alternativas | Motivo |
 |---|---|---|---|
 | ADR-01 | Java 25 + Spring Boot 4 | Java 21 + Boot 3 | Stack moderno, LTS |
-| ADR-02 | Gradle monorepo | Maven multi-modulo | Build unificado |
+| ADR-02 | Maven multi-modulo | Monorepo sin parent POM | Estandar ecosistema Java, IDE unificado |
 | ADR-03 | Clean Architecture por servicio | MVC clasico | Dominio aislado, testeable |
 | ADR-04 | Puertos Repository | JpaRepository en use cases | JPA solo en infra |
 | ADR-05 | Kafka + Transactional Outbox | REST sync, RabbitMQ | Async real + consistencia |
@@ -55,7 +55,7 @@ Reto Devsu: **2 microservicios** bancarios, API REST, JPA, Docker, comunicacion 
 | **client-service** | 8081 | Persona, Cliente (CRUD) |
 | **account-service** | 8082 | Cuenta, Movimiento, Reportes |
 
-Integracion entre servicios: **solo Kafka** (nunca REST sincrono). Stack: Java 25, Spring Boot 4, Gradle, PostgreSQL/JPA, Kafka+Outbox, Micrometer/Prometheus/Grafana, springdoc, JUnit 5/Mockito/Postman, Docker Compose.
+Integracion entre servicios: **solo Kafka** (nunca REST sincrono). Stack: Java 25, Spring Boot 4, Maven, PostgreSQL/JPA, Kafka+Outbox, Micrometer/Prometheus/Grafana, springdoc, JUnit 5/Mockito/Postman, Docker Compose.
 
 ```mermaid
 flowchart TB
@@ -69,7 +69,7 @@ flowchart TB
 
 Capas por servicio (`domain` → `application` → `infrastructure` → `api`). Repository pattern: puerto en application, JpaRepository en infrastructure.
 
-Estructura repo planificada: monorepo con `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F0 completada (spec + README + .gitignore).
+Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F2 completada (Maven + plataforma API).
 
 ---
 

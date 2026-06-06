@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "vscjava.vscode-java-pack",
-    "vscjava.vscode-gradle",
     "vmware.vscode-spring-boot"
   ]
 }

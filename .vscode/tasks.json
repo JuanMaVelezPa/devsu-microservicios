@@ -2,39 +2,39 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Gradle: build",
+      "label": "Maven: verify",
       "type": "shell",
-      "command": ".\\gradlew.bat",
-      "args": ["build"],
+      "command": ".\\mvnw.cmd",
+      "args": ["clean", "verify"],
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": ["$gradle"]
+      "problemMatcher": ["$maven"]
     },
     {
-      "label": "Gradle: test",
+      "label": "Maven: test",
       "type": "shell",
-      "command": ".\\gradlew.bat",
+      "command": ".\\mvnw.cmd",
       "args": ["test"],
       "group": "test",
-      "problemMatcher": ["$gradle"]
+      "problemMatcher": ["$maven"]
     },
     {
-      "label": "Gradle: client-service bootRun",
+      "label": "Maven: client-service spring-boot:run",
       "type": "shell",
-      "command": ".\\gradlew.bat",
-      "args": [":client-service:bootRun"],
+      "command": ".\\mvnw.cmd",
+      "args": ["-pl", "client-service", "spring-boot:run"],
       "isBackground": true,
-      "problemMatcher": ["$gradle"]
+      "problemMatcher": ["$maven"]
     },
     {
-      "label": "Gradle: account-service bootRun",
+      "label": "Maven: account-service spring-boot:run",
       "type": "shell",
-      "command": ".\\gradlew.bat",
-      "args": [":account-service:bootRun"],
+      "command": ".\\mvnw.cmd",
+      "args": ["-pl", "account-service", "spring-boot:run"],
       "isBackground": true,
-      "problemMatcher": ["$gradle"]
+      "problemMatcher": ["$maven"]
     }
   ]
 }
