@@ -9,7 +9,14 @@
   "java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-25.0.1",
   "java.import.maven.enabled": true,
   "java.import.maven.offline.enabled": false,
+  "java.import.maven.rootPaths": [
+    "."
+  ],
   "java.configuration.updateBuildConfiguration": "automatic",
+  "java.maven.updateProjectsOnConfigurationChange": true,
+  "java.import.generatesMetadataFilesAtProjectRoot": false,
+  "java.maven.downloadSources": true,
+  "java.eclipse.downloadSources": true,
   "java.compile.nullAnalysis.mode": "disabled",
   "files.exclude": {
     "**/target": true

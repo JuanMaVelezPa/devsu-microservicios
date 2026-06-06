@@ -1,0 +1,41 @@
+{
+  "groups": [
+    {
+      "name": "devsu",
+      "type": "com.devsu.client.infrastructure.config.DevsuProperties",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties"
+    },
+    {
+      "name": "devsu.kafka",
+      "type": "com.devsu.client.infrastructure.config.DevsuProperties$Kafka",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties",
+      "sourceMethod": "getKafka()"
+    },
+    {
+      "name": "devsu.outbox",
+      "type": "com.devsu.client.infrastructure.config.DevsuProperties$Outbox",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties",
+      "sourceMethod": "getOutbox()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "devsu.kafka.topic-client-events",
+      "type": "java.lang.String",
+      "description": "Kafka topic for client domain events.",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties$Kafka"
+    },
+    {
+      "name": "devsu.outbox.publish-interval-ms",
+      "type": "java.lang.Long",
+      "description": "Outbox publisher fixed delay in milliseconds.",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties$Outbox"
+    },
+    {
+      "name": "devsu.outbox.publisher-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables scheduled outbox publishing to Kafka.",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties$Outbox"
+    }
+  ]
+}

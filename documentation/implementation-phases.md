@@ -91,8 +91,8 @@ Ref: [instructions sec. 5](instructions.md#5-dtos-y-recursos)
 
 Outbox en misma TX; publisher @Scheduled 3s; topic `devsu.client.events`.
 
-- [ ] Mensaje en topic tras POST/PUT/DELETE
-- [ ] correlationId en outbox y header Kafka
+- [x] Mensaje en topic tras POST/PUT/DELETE
+- [x] correlationId en outbox y header Kafka
 
 Ref: [instructions sec. 2](instructions.md#2-kafka--outbox) | [data-model](data-model.md)
 
@@ -172,6 +172,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F2 | [x] Completo |
 | F3 | [x] Completo |
 | F4 | [x] Completo |
-| F5-F12 | [ ] Pendiente |
+| F5 | [x] Completo |
+| F6-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

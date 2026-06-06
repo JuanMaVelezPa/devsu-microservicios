@@ -8,5 +8,10 @@ spring:
     hibernate:
       ddl-auto: create-drop
     properties:
-      hibernate:
-        default_schema: client
+      hibernate.default_schema: client
+  kafka:
+    bootstrap-servers: localhost:9092
+
+devsu:
+  outbox:
+    publisher-enabled: false

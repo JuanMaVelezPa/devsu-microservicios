@@ -3,6 +3,7 @@ package com.devsu.client.application;
 import com.devsu.client.application.dto.ClienteCommand;
 import com.devsu.client.application.dto.ClientePageView;
 import com.devsu.client.application.dto.ClienteView;
+import com.devsu.client.application.port.ClienteOutboxPort;
 import com.devsu.client.application.port.ClienteRepositoryPort;
 import com.devsu.client.domain.exception.ClienteDuplicadoException;
 import com.devsu.client.domain.exception.ClienteNotFoundException;
@@ -22,10 +23,15 @@ public class ClienteApplicationService {
     private static final int MAX_SIZE = 100;
 
     private final ClienteRepositoryPort clienteRepository;
+    private final ClienteOutboxPort clienteOutboxPort;
     private final PasswordEncoder passwordEncoder;
 
-    public ClienteApplicationService(ClienteRepositoryPort clienteRepository, PasswordEncoder passwordEncoder) {
+    public ClienteApplicationService(
+            ClienteRepositoryPort clienteRepository,
+            ClienteOutboxPort clienteOutboxPort,
+            PasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
+        this.clienteOutboxPort = clienteOutboxPort;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,7 +42,9 @@ public class ClienteApplicationService {
         }
         Cliente cliente = mapToEntity(new Cliente(), command);
         cliente.setContrasena(passwordEncoder.encode(command.contrasena()));
-        return toView(clienteRepository.save(cliente));
+        cliente = clienteRepository.save(cliente);
+        clienteOutboxPort.enqueueCreated(cliente);
+        return toView(cliente);
     }
 
     @Transactional(readOnly = true)
@@ -67,13 +75,17 @@ public class ClienteApplicationService {
             cliente.setContrasena(passwordEncoder.encode(command.contrasena()));
         }
         cliente.setEstado(command.estado());
-        return toView(clienteRepository.save(cliente));
+        cliente = clienteRepository.save(cliente);
+        clienteOutboxPort.enqueueUpdated(cliente);
+        return toView(cliente);
     }
 
     public ClienteView deleteLogical(Long id) {
         Cliente cliente = findClienteOrThrow(id);
         cliente.setEstado(false);
-        return toView(clienteRepository.save(cliente));
+        cliente = clienteRepository.save(cliente);
+        clienteOutboxPort.enqueueDeleted(cliente.getId());
+        return toView(cliente);
     }
 
     public void validatePagination(int page, int size) {

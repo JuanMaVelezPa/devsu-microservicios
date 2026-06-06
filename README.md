@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F4 completada - CRUD clientes + Postman. Siguiente: F5 Outbox/Kafka. |
+| **Estado** | F5 completada - Outbox + Kafka publish. Siguiente: F6 Consumer. |
 
 ---
 
@@ -117,7 +117,7 @@ docker compose up -d
 
 **2. Microservicios** (local, hasta F10 en contenedor)
 
-Variables de BD: el `application.yml` usa por defecto `localhost:5432` y credenciales de `.env.example`. Spring Boot **no** carga el archivo `.env`; si exportaste vars, usa `POSTGRES_HOST=localhost` para ejecucion local.
+Variables de BD: el `application.yml` usa por defecto `localhost:5433` y credenciales de `.env.example`. Spring Boot **no** carga el archivo `.env`; usa `envFile` en `.vscode/launch.json` o exporta vars (`POSTGRES_HOST=localhost`, `POSTGRES_PORT=5433`).
 
 ```bash
 ./mvnw -pl client-service spring-boot:run    # :8081

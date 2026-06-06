@@ -4,8 +4,13 @@ server:
 spring:
   application:
     name: client-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:devsu_db}?currentSchema=client
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5433}/${POSTGRES_DB:devsu_db}?currentSchema=client
     username: ${POSTGRES_USER:devsu}
     password: ${POSTGRES_PASSWORD:devsu_secret}
   jpa:
@@ -13,8 +18,13 @@ spring:
       ddl-auto: validate
     open-in-view: false
     properties:
-      hibernate:
-        default_schema: client
+      hibernate.default_schema: client
+
+devsu:
+  kafka:
+    topic-client-events: ${KAFKA_TOPIC_CLIENT_EVENTS:devsu.client.events}
+  outbox:
+    publish-interval-ms: 3000
 
 springdoc:
   swagger-ui:
