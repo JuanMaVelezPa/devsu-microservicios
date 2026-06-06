@@ -1,0 +1,55 @@
+# --- Notas internas (no entregar) ---
+.git-phases.local.md
+*.local.md
+
+# --- Secretos y configuracion local ---
+.env
+.env.local
+*.pem
+*.key
+
+# --- Logs (ADR-12: logs JSON en runtime) ---
+logs/
+*.log
+
+# --- Gradle / Java build ---
+.gradle/
+build/
+**/build/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+
+# --- IDE ---
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+*.swp
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Entrega local (generar al exportar; no versionar copias sueltas) ---
+*.zip
+*.rar
+*.7z
+
+# --- Test / coverage (si se activan mas adelante) ---
+.jacoco/
+**/jacoco/
+*.exec
+
+# --- Docker volumes locales (si se montan en carpeta del proyecto) ---
+docker-data/
+postgres-data/
