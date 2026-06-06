@@ -1,6 +1,6 @@
 ---
 title: Devsu Microservicios - Evaluacion Final
-version: 3.6
+version: 3.7
 encoding: ASCII
 ---
 
@@ -10,9 +10,17 @@ Checklist para validar cumplimiento del reto Devsu antes de entregar.
 
 Especificacion del proyecto: [instructions.md](instructions.md)
 
-Indice documentacion: [README.md](README.md)
+Indice documentacion: [README.md](../README.md)
 
 Marcar cada item al completarlo. **Obligatorio** = exigido por Devsu. **Proyecto** = decisiones propias del stack. **Bonus** = puntaje extra.
+
+### Estado actual (2026-06-06)
+
+| Area | Avance |
+|---|---|
+| Codigo + tests automaticos | F0-F11 implementadas; `./mvnw clean verify` verde |
+| Validacion manual Casos 1-5 | Pendiente ejecutar Postman contra Docker |
+| Entrega F12 | Pendiente ZIP/RAR, commits F11-F12 y marcar seccion B |
 
 ---
 
@@ -58,18 +66,23 @@ Marcar cada item al completarlo. **Obligatorio** = exigido por Devsu. **Proyecto
 
 ### F5 - Pruebas unitarias
 
-- [x] Minimo 1 test unitario sobre entidad Cliente
-- [x] Ejecutable con la suite de tests
+- [x] Minimo 1 test unitario sobre entidad Cliente (`ClienteTest`)
+- [x] Tests application con Mockito (`ClienteApplicationServiceTest`, `MovimientoApplicationServiceTest`)
+- [x] Tests API MockMvc (Casos Anexo A, envelope, F3 saldo)
+- [x] Integracion Kafka consumer (`ClienteEventConsumerIntegrationTest`)
+- [x] Suite ejecutable: `./mvnw clean verify` (37 tests, 0 fallos)
 
 ### Docker y entregables
 
-- [x] Solucion desplegada y funcional en Docker *(validado: `docker compose up`, health 200, targets UP)*
+- [x] Solucion desplegada y funcional en Docker *(F10: `docker compose up -d --build`, health 200, targets Prometheus UP)*
 - [x] `BaseDatos.sql` presente
-- [x] Coleccion Postman JSON incluida
+- [x] Coleccion Postman JSON incluida *(Casos 1-5 + tests automatizados en Caso 5)*
+- [x] OpenAPI / Swagger UI en ambos microservicios
 - [x] Repositorio GitHub publico
-- [ ] Archivo ZIP o RAR generado
-- [x] README con instrucciones de despliegue *(modo Docker F10 + local + observabilidad)*
-- [ ] Repositorio GitHub con historial de commits claro
+- [x] README con instrucciones de despliegue *(Docker, local, observabilidad, Postman)*
+- [x] Sin secretos en repo *(`.env` en `.gitignore`; usar `.env.example`)*
+- [ ] Archivo ZIP o RAR generado *(F12)*
+- [ ] Historial Git con commits F11 y F12 *(F0-F10 ya commiteados por fase: `docs(f0)` … `feat(f10)`)*
 
 ---
 
@@ -77,13 +90,17 @@ Marcar cada item al completarlo. **Obligatorio** = exigido por Devsu. **Proyecto
 
 Referencia de datos: Anexo A en [instructions.md](instructions.md)
 
-- [ ] Caso 1: 3 clientes creados *(validar con Postman)*
-- [ ] Caso 2: 4 cuentas iniciales *(validar con Postman)*
-- [ ] Caso 3: Cuenta 585545 para Jose Lema *(validar con Postman)*
-- [ ] Caso 4: 4 movimientos ejecutados correctamente *(validar con Postman)*
-- [ ] Caso 5: Reporte por fechas coincide con resultado esperado *(validar con Postman)*
+Validacion **manual end-to-end** con stack Docker + Postman. Los tests Maven cubren la misma logica en H2/Kafka embebido, pero esta seccion exige demostrar el flujo real (incluye sync Kafka y pausa outbox).
 
-> Coleccion Postman actualizada (F4-F9). Ejecutar flujo en [README.md](../README.md#como-ejecutar). Tras F10, preferir modo Docker del README.
+| Caso | Item | Cobertura automatica |
+|---|---|---|
+| 1 | [ ] 3 clientes creados *(Postman)* | `ClienteApiTest` |
+| 2 | [ ] 4 cuentas iniciales *(Postman)* | `CuentaApiTest` |
+| 3 | [ ] Cuenta 585545 para Jose Lema *(Postman)* | `CuentaApiTest` |
+| 4 | [ ] 4 movimientos ejecutados correctamente *(Postman)* | `MovimientoApiTest` |
+| 5 | [ ] Reporte por fechas coincide con resultado esperado *(Postman)* | `ReporteApiTest` + tests en coleccion Postman |
+
+> Guia paso a paso: [validacion-prueba.md](validacion-prueba.md) | SQL async: [queries-verificacion-async.sql](queries-verificacion-async.sql)
 
 ---
 
@@ -109,26 +126,40 @@ Referencia: tabla ADR y secciones 1-6 en [instructions.md](instructions.md)
 - [x] Contrasena cliente: hash BCrypt en POST/PUT; nunca en GET/logs/Kafka (ADR-15)
 - [x] GlobalExceptionHandler mapea excepciones dominio -> HTTP 4xx
 - [x] client-service :8081, account-service :8082
-- [x] Micrometer + Prometheus + Grafana operativos *(F10: apps en compose + scrape)*
-- [x] Pruebas con JUnit 5 + Mockito
+- [x] Micrometer + Prometheus + Grafana operativos *(F10: apps en compose + scrape + dashboard)*
+- [x] Pruebas con JUnit 5 + Mockito *(F11: dominio, application, API e integracion Kafka)*
 
 ---
 
 ## D. Bonus (puntaje extra)
 
-- [x] F6: 1 prueba de integracion
+- [x] F6: 1 prueba de integracion (`ClienteEventConsumerIntegrationTest`)
 - [x] F7: Despliegue completo en contenedores *(F10: MS + infra en compose)*
-- [ ] Diseno documenta rendimiento, escalabilidad, resiliencia (outbox aporta resiliencia)
+- [ ] Diseno documenta rendimiento, escalabilidad, resiliencia *(parcial: Outbox + idempotencia en [instructions sec. 2](instructions.md#2-kafka--outbox); sin seccion dedicada rendimiento/escalabilidad)*
 - [ ] Virtual threads u optimizaciones adicionales
+
+---
+
+## E. Entrega F12 (checklist operativo)
+
+- [x] Guia de validacion [validacion-prueba.md](validacion-prueba.md)
+- [x] Consultas SQL async [queries-verificacion-async.sql](queries-verificacion-async.sql)
+- [x] Postman actualizado (Casos 1-5, carpetas por servicio, tests Caso 5)
+- [ ] Ejecutar flujo Casos 1-5 en Docker y marcar seccion B
+- [ ] Commit `test(f11): pruebas unitarias y de integracion`
+- [ ] Commit `chore(f12): entrega - Postman, OpenAPI y documentacion final`
+- [ ] Generar ZIP/RAR del proyecto (sin `target/`, `.env`, logs)
+- [ ] Push final a GitHub
 
 ---
 
 ## Estado final
 
-| Criterio | Estado |
-|---|---|
-| Obligatorios (A + B) | [ ] Completo |
-| Stack proyecto (C) | [ ] Completo |
-| Bonus (D) | [ ] Completo |
+| Criterio | Estado | Notas |
+|---|---|---|
+| Obligatorios codigo (A, sin B) | [x] Completo | Falta ZIP e historial F11-F12 |
+| Casos de uso (B) | [ ] Pendiente | Validacion manual Postman + Docker |
+| Stack proyecto (C) | [x] Completo | |
+| Bonus (D) | [ ] Parcial | Integracion + Docker full; doc rendimiento pendiente |
 
-**Resultado:** [ ] APROBADO  |  [ ] PENDIENTE
+**Resultado:** [ ] APROBADO  |  [x] PENDIENTE *(cerrar B + F12 para aprobar)*

@@ -152,19 +152,24 @@ Dockerfiles multi-stage, microservicios en compose, Actuator + Micrometer, scrap
 
 ## F11 - Pruebas
 
-Min. 1 test unitario Cliente; bonus Testcontainers.
+JUnit 5 + Mockito (unitarias) e integracion con H2 + spring-kafka-test.
 
-- [ ] `./mvnw test` verde
+- [x] Test unitario entidad `Cliente` (`ClienteTest`)
+- [x] Tests unitarios application con Mockito (`ClienteApplicationServiceTest`, `MovimientoApplicationServiceTest`)
+- [x] Tests API MockMvc (F4-F9, envelope, F3)
+- [x] Integracion Kafka consumer (`ClienteEventConsumerIntegrationTest`)
+- [x] `./mvnw test` / `./mvnw verify` verde
 
 ---
 
 ## F12 - Entrega final
 
-Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
+Postman, OpenAPI, guia validacion, evaluation, repo publico + ZIP/RAR.
 
-- [ ] Flujo Casos 1-5 reproducible
+- [x] Guia validacion [validacion-prueba.md](validacion-prueba.md)
+- [ ] Flujo Casos 1-5 reproducible (Postman)
 - [ ] Sin secretos en repo
-- [ ] README con instrucciones finales de ejecucion
+- [ ] ZIP/RAR generado
 
 ---
 
@@ -183,6 +188,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F8 | [x] Completo |
 | F9 | [x] Completo |
 | F10 | [x] Completo |
-| F11-F12 | [ ] Pendiente |
+| F11 | [x] Completo |
+| F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

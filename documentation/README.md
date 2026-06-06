@@ -1,12 +1,14 @@
 # Documentacion Devsu
 
+Entrada al proyecto: [README.md](../README.md)
+
 | Archivo | Contenido |
 |---|---|
-| [instructions.md](instructions.md) | ADR, arquitectura, API, Anexo A |
+| [instructions.md](instructions.md) | ADR, arquitectura, contrato API, Anexo A |
 | [data-model.md](data-model.md) | ER, columnas SQL, payload Kafka |
 | [implementation-phases.md](implementation-phases.md) | Fases F0-F12 |
 | [evaluation.md](evaluation.md) | Checklist pre-entrega |
+| [validacion-prueba.md](validacion-prueba.md) | Guia operativa Casos 1-5 (Postman + SQL) |
+| [queries-verificacion-async.sql](queries-verificacion-async.sql) | Consultas outbox / cliente_referencia |
 
-**Fuente de verdad por tema:** ADR y API -> instructions | BD -> data-model | Fases -> implementation-phases | Verificar entrega -> evaluation.
-
-Estado: F10 completada (stack Docker + Prometheus/Grafana + metricas `devsu.*`). Observabilidad: [README.md](../README.md#observabilidad-micrometer--prometheus--grafana). Entrada: [README.md](../README.md).
+Estado: F11 completada.

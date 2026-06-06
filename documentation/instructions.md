@@ -69,7 +69,7 @@ flowchart TB
 
 Capas por servicio (`domain` -> `application` -> `infrastructure` -> `api`). Repository pattern: puerto en application, JpaRepository en infrastructure.
 
-Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`, `infra/` (Prometheus/Grafana). Entrada al proyecto: [README.md](../README.md). Estado: **F10 completada** (stack Docker full + Micrometer/Prometheus/Grafana + dashboard de negocio). Siguiente: F11-F12 entrega.
+Estructura repo: monorepo Maven, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada: [README.md](../README.md).
 
 ---
 
@@ -233,11 +233,7 @@ Ejemplo Caso 5: `GET /api/reportes?fechaDesde=2022-02-01&fechaHasta=2022-02-28&c
 
 ### Flujo de prueba (Casos 1-5)
 
-1. Docker Compose up
-2. POST clientes :8081 (Caso 1) -> esperar sync Kafka -> `cliente_referencia`
-3. POST cuentas :8082 (Casos 2-3)
-4. POST movimientos :8082 (Caso 4; fechas 2022 para Caso 5)
-5. GET reportes :8082 (Caso 5)
+Guia detallada: [validacion-prueba.md](validacion-prueba.md)
 
 ---
 
