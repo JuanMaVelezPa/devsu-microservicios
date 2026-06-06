@@ -9,4 +9,4 @@
 
 **Fuente de verdad por tema:** ADR y API -> instructions | BD -> data-model | Fases -> implementation-phases | Verificar entrega -> evaluation.
 
-Estado: F2 completada (Maven + plataforma API). Entrada: [README.md](../README.md).
+Estado: F3 completada (Docker infra + BaseDatos.sql). Entrada: [README.md](../README.md).

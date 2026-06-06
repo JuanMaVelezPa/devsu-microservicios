@@ -1,4 +1,4 @@
-# Devsu � Microservicios bancarios
+# Devsu - Microservicios bancarios
 
 Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunicacion **asincrona** (Kafka + Transactional Outbox) y despliegue en Docker. Enfoque **Clean Architecture** y patrones habituales en entornos financieros (consistencia eventual, trazabilidad, separacion de dominios).
 
@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F2 completada � Maven multi-m�dulo, plataforma API. Implementaci�n en fases F3�F12. |
+| **Estado** | F3 completada - Maven multi-modulo, plataforma API, Docker infra. Implementacion en fases F4-F12. |
 
 ---
 
@@ -30,12 +30,12 @@ Documentacion tecnica: [documentation/instructions.md](documentation/instruction
 |---|---|
 | Lenguaje | Java 25 |
 | Framework | Spring Boot 4 |
-| Build | Maven (multi-m�dulo) |
-| Persistencia | PostgreSQL, JPA/Hibernate |
-| Mensajeria | Apache Kafka + Transactional Outbox |
+| Build | Maven (multi-modulo) |
+| Persistencia | PostgreSQL 18 (Docker), JPA/Hibernate |
+| Mensajeria | Apache Kafka 4.3 + Transactional Outbox |
 | API | REST, envelope `ApiResponse`, OpenAPI (springdoc) |
 | Seguridad datos | BCrypt en contrasena (sin JWT; no exigido por el reto) |
-| Observabilidad | Micrometer, Prometheus, Grafana, logs con `correlationId` |
+| Observabilidad | Micrometer, Prometheus 3.12, Grafana 13, logs con `correlationId` |
 | Pruebas | JUnit 5, Mockito, Postman; Testcontainers (bonus) |
 | Runtime | Docker, Docker Compose |
 
@@ -45,19 +45,19 @@ Documentacion tecnica: [documentation/instructions.md](documentation/instruction
 
 ```
 Devsu/
-??? pom.xml
-??? mvnw / mvnw.cmd
-??? .mvn/wrapper/
-??? README.md
-??? .gitignore
-??? documentation/
-??? client-service/           # (F1+)
-??? account-service/          # (F1+)
-??? docker-compose.yml        # (F3+)
-??? BaseDatos.sql             # (F3+)
-??? .env.example              # (F3+)
-??? infra/                    # (F3+)
-??? postman/                  # (F12)
+|-- pom.xml
+|-- mvnw / mvnw.cmd
+|-- .mvn/wrapper/
+|-- README.md
+|-- .gitignore
+|-- documentation/
+|-- client-service/
+|-- account-service/
+|-- docker-compose.yml
+|-- BaseDatos.sql
+|-- .env.example
+|-- infra/
+|-- postman/                  (F12)
 ```
 
 ---
@@ -69,18 +69,23 @@ Devsu/
 ./mvnw test                  # solo tests
 ```
 
-## Como ejecutar (cuando este implementado)
-
-> Se completara en F3 (infra) y F10 (stack full).
+## Como ejecutar infra (F3)
 
 ```bash
 copy .env.example .env
 docker compose up -d
+```
+
+Servicios de infra: PostgreSQL :5432, Kafka :9092, Prometheus :9090, Grafana :3000 (admin/admin por defecto en `.env.example`).
+
+Microservicios (local, hasta F10):
+
+```bash
 ./mvnw -pl client-service spring-boot:run    # :8081
 ./mvnw -pl account-service spring-boot:run   # :8082
 ```
 
-Flujo de prueba Casos 1�5: [documentation/instructions.md](documentation/instructions.md).
+Flujo de prueba Casos 1-5: [documentation/instructions.md](documentation/instructions.md).
 
 ---
 
@@ -90,7 +95,7 @@ Flujo de prueba Casos 1�5: [documentation/instructions.md](documentation/instr
 |---|---|
 | [documentation/instructions.md](documentation/instructions.md) | ADR, arquitectura, contrato API, Anexo A |
 | [documentation/data-model.md](documentation/data-model.md) | Modelo ER y SQL |
-| [documentation/implementation-phases.md](documentation/implementation-phases.md) | Roadmap F0�F12 |
+| [documentation/implementation-phases.md](documentation/implementation-phases.md) | Roadmap F0-F12 |
 | [documentation/evaluation.md](documentation/evaluation.md) | Checklist pre-entrega |
 
 ---
@@ -111,4 +116,4 @@ La carpeta `documentation/` documenta el proceso y las decisiones para la entrev
 
 ---
 
-*Proyecto en construccion � sector financiero / Java backend.*
+*Proyecto en construccion - sector financiero / Java backend.*

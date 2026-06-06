@@ -67,9 +67,9 @@ flowchart TB
   K --> AS
 ```
 
-Capas por servicio (`domain` → `application` → `infrastructure` → `api`). Repository pattern: puerto en application, JpaRepository en infrastructure.
+Capas por servicio (`domain` -> `application` -> `infrastructure` -> `api`). Repository pattern: puerto en application, JpaRepository en infrastructure.
 
-Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F2 completada (Maven + plataforma API).
+Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F3 completada (Docker infra + BaseDatos.sql).
 
 ---
 
@@ -136,15 +136,15 @@ Todas las respuestas usan `ApiResponse<T>`: `success`, `data`, `error` { `code`,
 
 | Situacion | HTTP | error.code |
 |---|---|---|
-| Exito GET/PUT | 200 | — |
-| POST creado | 201 | — |
+| Exito GET/PUT | 200 | - |
+| POST creado | 201 | - |
 | Validacion | 400 | VALIDATION_ERROR |
 | No encontrado | 404 | CLIENTE_NOT_FOUND, CUENTA_NOT_FOUND |
 | Regla de negocio | 422 | SALDO_NO_DISPONIBLE, CLIENTE_INACTIVO |
 | Duplicado | 409 | CLIENTE_DUPLICADO, CUENTA_DUPLICADA |
 | Error interno | 500 | INTERNAL_ERROR |
 
-**F3 (obligatorio):** HTTP **422**, code `SALDO_NO_DISPONIBLE`, message **`Saldo no disponible`** (exacto, con tilde).
+**F3 (obligatorio):** HTTP **422**, code `SALDO_NO_DISPONIBLE`, message **`Saldo no disponible`** (texto exacto del reto).
 
 Dominio lanza excepciones; `GlobalExceptionHandler` en `api` mapea a envelope + HTTP. Sin stack trace al cliente.
 
@@ -154,7 +154,7 @@ GET list de `/clientes`, `/cuentas`, `/movimientos`: query `page` (default **0**
 
 ### 4.4 Trazabilidad (ADR-12)
 
-`CorrelationIdFilter` (OncePerRequestFilter) → MDC `correlationId` → body + header response. Logback: consola legible + archivo `logs/{service}.json` (logstash-logback-encoder). Propagar a `outbox_event.correlation_id` y headers Kafka. Consumer restaura MDC. No loguear PII en INFO.
+`CorrelationIdFilter` (OncePerRequestFilter) -> MDC `correlationId` -> body + header response. Logback: consola legible + archivo `logs/{service}.json` (logstash-logback-encoder). Propagar a `outbox_event.correlation_id` y headers Kafka. Consumer restaura MDC. No loguear PII en INFO.
 
 Componentes por servicio (sin modulo shared): `CorrelationIdFilter`, `CorrelationContext`, `GlobalExceptionHandler`, `ApiResponse`, `PageResponse`.
 
@@ -162,7 +162,7 @@ Componentes por servicio (sin modulo shared): `CorrelationIdFilter`, `Correlatio
 
 ## 5. DTOs y recursos
 
-Convenciones: IDs `number` (Long); `numeroCuenta` string; fechas `yyyy-MM-dd`; enums `AHORROS|CORRIENTE|ACTIVA|INACTIVA|DEPOSITO|RETIRO`. DELETE cliente = baja logica (`estado=false`, HTTP 200). Mapeo API→BD: [data-model.md](data-model.md).
+Convenciones: IDs `number` (Long); `numeroCuenta` string; fechas `yyyy-MM-dd`; enums `AHORROS|CORRIENTE|ACTIVA|INACTIVA|DEPOSITO|RETIRO`. DELETE cliente = baja logica (`estado=false`, HTTP 200). Mapeo API->BD: [data-model.md](data-model.md).
 
 ### Clientes (`/api/clientes`)
 
@@ -172,7 +172,7 @@ Convenciones: IDs `number` (Long); `numeroCuenta` string; fechas `yyyy-MM-dd`; e
 
 | Metodo | HTTP | Notas |
 |---|---|---|
-| POST | 201 | UK identificacion → 409 CLIENTE_DUPLICADO |
+| POST | 201 | UK identificacion -> 409 CLIENTE_DUPLICADO |
 | GET / GET/{id} | 200 / 404 | List paginado; incluye inactivos |
 | PUT /{id} | 200 / 404 | Publica ClienteActualizado (F5) |
 | DELETE /{id} | 200 | estado=false; ClienteEliminado (F5) |
@@ -206,7 +206,7 @@ Query: fechaDesde*, fechaHasta* (inclusive), cliente* (nombre exacto, case-insen
 
 **ReporteResponse:** cliente, fechaDesde, fechaHasta, cuentas[] { numeroCuenta, saldoActual, movimientos[] { fecha, valor, saldoResultante } }.
 
-Todas las cuentas del cliente; movimientos filtrados por rango. Cliente inexistente → 404 CLIENTE_NOT_FOUND.
+Todas las cuentas del cliente; movimientos filtrados por rango. Cliente inexistente -> 404 CLIENTE_NOT_FOUND.
 
 Ejemplo Caso 5: `GET /api/reportes?fechaDesde=2022-02-01&fechaHasta=2022-02-28&cliente=Marianela Montalvo`
 
@@ -226,24 +226,24 @@ Ejemplo Caso 5: `GET /api/reportes?fechaDesde=2022-02-01&fechaHasta=2022-02-28&c
 ## 6. Calidad, infra y pruebas
 
 - **Pruebas:** JUnit 5 + Mockito (min. 1 test Cliente); Testcontainers bonus; Postman Anexo A.
-- **Observabilidad:** Micrometer → `/actuator/prometheus`; Grafana; ADR-12 logs.
+- **Observabilidad:** Micrometer -> `/actuator/prometheus`; Grafana; ADR-12 logs.
 - **Java 25:** Records en DTOs; sealed classes opcional en excepciones; entidades JPA como clases.
-- **Docker (ADR-13):** `.env.example` → `.env` → `docker compose up`. Variables: POSTGRES_*, KAFKA_PORT, GRAFANA_*, PROMETHEUS_PORT, CLIENT/ACCOUNT_SERVICE_PORT, KAFKA_TOPIC_CLIENT_EVENTS.
+- **Docker (ADR-13):** `.env.example` -> `.env` -> `docker compose up`. Variables: POSTGRES_*, KAFKA_PORT, GRAFANA_*, PROMETHEUS_PORT, CLIENT/ACCOUNT_SERVICE_PORT, KAFKA_TOPIC_CLIENT_EVENTS.
 - **Contenedores:** client-service, account-service, postgres, kafka, prometheus, grafana.
 
 ### Flujo de prueba (Casos 1-5)
 
 1. Docker Compose up
-2. POST clientes :8081 (Caso 1) → esperar sync Kafka → `cliente_referencia`
+2. POST clientes :8081 (Caso 1) -> esperar sync Kafka -> `cliente_referencia`
 3. POST cuentas :8082 (Casos 2-3)
 4. POST movimientos :8082 (Caso 4; fechas 2022 para Caso 5)
 5. GET reportes :8082 (Caso 5)
 
 ---
 
-## Anexo A — Datos de prueba (reto Devsu)
+## Anexo A - Datos de prueba (reto Devsu)
 
-**Mapeo a la API:** tipo cuenta del Anexo → `AHORROS` / `CORRIENTE` en JSON. Movimientos: deposito = `valor` positivo; retiro = `valor` negativo (ej. retiro 575 en cuenta 478758 → `"valor": -575`).
+**Mapeo a la API:** tipo cuenta del Anexo -> `AHORROS` / `CORRIENTE` en JSON. Movimientos: deposito = `valor` positivo; retiro = `valor` negativo (ej. retiro 575 en cuenta 478758 -> `"valor": -575`).
 
 ### A.1 Clientes
 

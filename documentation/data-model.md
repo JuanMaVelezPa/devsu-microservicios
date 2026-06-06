@@ -9,7 +9,7 @@ related:
   - implementation-phases.md
 ---
 
-# Modelo de datos ó ER y tipos SQL
+# Modelo de datos - ER y tipos SQL
 
 Fuente de verdad para `BaseDatos.sql` y entidades JPA. Reglas de negocio y API: [instructions.md](instructions.md).
 
@@ -40,7 +40,7 @@ erDiagram
 
 ## Schema `client`
 
-### `persona` ó raiz JPA JOINED
+### `persona` ù raiz JPA JOINED
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -53,7 +53,7 @@ erDiagram
 | telefono | VARCHAR(20) | SI | |
 | created_at / updated_at | TIMESTAMP | NO | DEFAULT CURRENT_TIMESTAMP |
 
-### `cliente` ó extension JOINED (misma PK)
+### `cliente` ù extension JOINED (misma PK)
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -61,7 +61,7 @@ erDiagram
 | contrasena | VARCHAR(255) | NO | Hash BCrypt (ADR-15) |
 | estado | BOOLEAN | NO | DEFAULT TRUE; FALSE = baja logica |
 
-### `outbox_event` ó Transactional Outbox
+### `outbox_event` ù Transactional Outbox
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -80,7 +80,7 @@ Indice: `idx_outbox_pending` WHERE published_at IS NULL.
 
 ## Schema `account`
 
-### `cliente_referencia` ó proyeccion Kafka (ADR-07)
+### `cliente_referencia` - proyeccion Kafka (ADR-07)
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -104,7 +104,7 @@ Regla: crear cuenta exige `activo=true`.
 | estado | VARCHAR(20) | NO | DEFAULT ACTIVA; CHECK ACTIVA, INACTIVA |
 | created_at / updated_at | TIMESTAMP | NO | |
 
-### `movimiento` ó inmutable (sin UPDATE API)
+### `movimiento` ù inmutable (sin UPDATE API)
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -118,7 +118,7 @@ Regla: crear cuenta exige `activo=true`.
 
 Indice: `idx_movimiento_cuenta_fecha` (cuenta_id, fecha). Retiro con |valor| > saldo -> F3 sin INSERT.
 
-### `processed_event` ó idempotencia consumer
+### `processed_event` ù idempotencia consumer
 
 | Columna | Tipo | Null |
 |---|---|---|
@@ -157,4 +157,4 @@ Consumer: Creado/Actualizado -> UPSERT `cliente_referencia`; Eliminado -> `activ
 
 ---
 
-*v1.3 ó Cambios estructurales requieren nuevo ADR en instructions.md.*
+*v1.3 ù Cambios estructurales requieren nuevo ADR en instructions.md.*
