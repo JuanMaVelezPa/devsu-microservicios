@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F6 completada - Consumer Kafka + cliente_referencia. Siguiente: F7 Cuentas. |
+| **Estado** | F7 completada - CRU cuentas con validacion de cliente_referencia. Siguiente: F8 Movimientos. |
 
 ---
 

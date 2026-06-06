@@ -112,8 +112,8 @@ KafkaListener, UPSERT `cliente_referencia`, idempotencia `processed_event`.
 
 POST/GET/PUT `/api/cuentas`; validar cliente_referencia activo.
 
-- [ ] 422 sin referencia; 409 duplicado numeroCuenta
-- [ ] Casos 2 y 3 Anexo A
+- [x] 422 sin referencia; 409 duplicado numeroCuenta
+- [x] Casos 2 y 3 Anexo A
 
 ---
 
@@ -174,6 +174,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F4 | [x] Completo |
 | F5 | [x] Completo |
 | F6 | [x] Completo |
-| F7-F12 | [ ] Pendiente |
+| F7 | [x] Completo |
+| F8-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*
