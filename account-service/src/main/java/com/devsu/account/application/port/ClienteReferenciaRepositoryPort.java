@@ -8,5 +8,7 @@ public interface ClienteReferenciaRepositoryPort {
 
     Optional<ClienteReferencia> findById(Long id);
 
+    Optional<ClienteReferencia> findByNombreIgnoreCase(String nombre);
+
     ClienteReferencia save(ClienteReferencia clienteReferencia);
 }

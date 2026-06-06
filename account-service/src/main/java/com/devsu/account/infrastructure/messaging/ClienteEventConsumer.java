@@ -39,6 +39,7 @@ public class ClienteEventConsumer {
 
         try {
             applyCorrelationContext(correlationId);
+            log.debug("Evento Kafka recibido type={} eventId={}", eventType, eventId);
             syncService.processEvent(eventId, eventType, record.value());
         } finally {
             MDC.clear();

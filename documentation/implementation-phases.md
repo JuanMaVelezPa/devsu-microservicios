@@ -131,8 +131,8 @@ POST/GET `/api/movimientos`; F3: 422, `SALDO_NO_DISPONIBLE`, `"Saldo no disponib
 
 GET `/api/reportes` con fechaDesde, fechaHasta, cliente.
 
-- [ ] Caso 5 Marianela Montalvo feb-2022
-- [ ] Cliente inexistente -> 404
+- [x] Caso 5 Marianela Montalvo feb-2022
+- [x] Cliente inexistente -> 404
 
 ---
 
@@ -176,6 +176,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F6 | [x] Completo |
 | F7 | [x] Completo |
 | F8 | [x] Completo |
-| F9-F12 | [ ] Pendiente |
+| F9 | [x] Completo |
+| F10-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

@@ -4,6 +4,7 @@ import com.devsu.account.domain.model.Cuenta;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CuentaRepositoryPort {
@@ -17,4 +18,6 @@ public interface CuentaRepositoryPort {
     boolean existsByNumeroCuenta(String numeroCuenta);
 
     Optional<Cuenta> findByNumeroCuenta(String numeroCuenta);
+
+    List<Cuenta> findByClienteIdOrderByIdAsc(Long clienteId);
 }

@@ -4,7 +4,6 @@ import com.devsu.account.domain.model.EstadoCuenta;
 import com.devsu.account.domain.model.TipoCuenta;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public record CuentaView(
         Long id,

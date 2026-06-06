@@ -69,7 +69,7 @@ flowchart TB
 
 Capas por servicio (`domain` -> `application` -> `infrastructure` -> `api`). Repository pattern: puerto en application, JpaRepository en infrastructure.
 
-Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F3 completada (Docker infra + BaseDatos.sql).
+Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F9 completada (API F4-F9 + Postman Casos 1-5; pendiente F10 apps en Docker).
 
 ---
 

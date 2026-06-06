@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F8 completada - movimientos con regla de saldo insuficiente F3. Siguiente: F9 Reportes. |
+| **Estado** | F9 completada - reportes por cliente y rango de fechas. Siguiente: F10 Observabilidad Docker. |
 
 ---
 
@@ -50,13 +50,13 @@ Requisito previo: `docker compose up -d` y microservicios en local (`spring-boot
 | PUT | `/api/clientes/{id}` |
 | DELETE | `/api/clientes/{id}` (baja logica) |
 
-**account-service :8082** *(F7-F9)*
+**account-service :8082** *(F7-F9 implementado)*
 
 | Metodo | Path |
 |---|---|
 | GET | `/api/health` |
-| POST/GET/PUT | `/api/cuentas` |
-| POST/GET | `/api/movimientos` |
+| POST/GET/PUT | `/api/cuentas`, `/api/cuentas/{id}` |
+| POST/GET | `/api/movimientos`, `/api/movimientos/{id}` |
 | GET | `/api/reportes?fechaDesde=&fechaHasta=&cliente=` |
 
 Todas las respuestas usan envelope `ApiResponse` con header opcional `X-Correlation-Id`.
@@ -126,9 +126,20 @@ Variables de BD: el `application.yml` usa por defecto `localhost:5433` y credenc
 
 **3. Postman**
 
-Importar `postman/Devsu.postman_collection.json` y `postman/Devsu-Local.postman_environment.json`. Carpeta **F4 - Caso 1** crea los 3 clientes del Anexo A.
+Importar `postman/Devsu.postman_collection.json` y `postman/Devsu-Local.postman_environment.json`.
 
-Flujo completo Casos 1-5: [documentation/instructions.md](documentation/instructions.md).
+**Flujo rapido Anexo A (Casos 1-5):**
+
+| Paso | Carpeta Postman | Notas |
+|---|---|---|
+| 1 | client-service > **F4 - Caso 1** | 3 POST clientes; scripts guardan `joseClienteId`, etc. |
+| 2 | — | Esperar ~5 s (outbox + Kafka -> `cliente_referencia`) |
+| 3 | account-service > **F7 - Caso 2** | 4 cuentas iniciales |
+| 4 | account-service > **F7 - Caso 3** | Cuenta 585545 Jose Lema |
+| 5 | account-service > **F8 - Caso 4** | 4 movimientos (fechas feb-2022) |
+| 6 | account-service > **F9 - Caso 5** | GET reporte Marianela Montalvo |
+
+Carpetas **utilidades** incluyen casos de error (422 F3, 404, 409). Detalle: [documentation/instructions.md](documentation/instructions.md).
 
 ---
 

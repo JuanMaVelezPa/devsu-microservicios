@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,5 +32,11 @@ public class MovimientoRepositoryAdapter implements MovimientoRepositoryPort {
     @Override
     public Page<Movimiento> findAll(Pageable pageable) {
         return jpaRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Movimiento> findByCuentaIdAndFechaBetweenOrderByFechaAscIdAsc(
+            Long cuentaId, LocalDate fechaDesde, LocalDate fechaHasta) {
+        return jpaRepository.findByCuentaIdAndFechaBetweenOrderByFechaAscIdAsc(cuentaId, fechaDesde, fechaHasta);
     }
 }

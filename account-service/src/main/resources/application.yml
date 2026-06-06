@@ -26,3 +26,7 @@ devsu:
   kafka:
     topic-client-events: ${KAFKA_TOPIC_CLIENT_EVENTS:devsu.client.events}
     consumer-group: account-service-client-events
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

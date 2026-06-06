@@ -9,4 +9,4 @@
 
 **Fuente de verdad por tema:** ADR y API -> instructions | BD -> data-model | Fases -> implementation-phases | Verificar entrega -> evaluation.
 
-Estado: F4 completada (CRUD clientes + Postman). Entrada: [README.md](../README.md).
+Estado: F9 completada (F4-F9 API + Postman Anexo A). Entrada: [README.md](../README.md).

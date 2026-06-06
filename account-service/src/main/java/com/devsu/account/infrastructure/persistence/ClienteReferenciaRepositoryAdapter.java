@@ -21,6 +21,11 @@ public class ClienteReferenciaRepositoryAdapter implements ClienteReferenciaRepo
     }
 
     @Override
+    public Optional<ClienteReferencia> findByNombreIgnoreCase(String nombre) {
+        return jpaRepository.findByNombreIgnoreCase(nombre);
+    }
+
+    @Override
     public ClienteReferencia save(ClienteReferencia clienteReferencia) {
         return jpaRepository.save(clienteReferencia);
     }
