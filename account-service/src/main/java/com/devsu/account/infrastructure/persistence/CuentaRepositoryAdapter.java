@@ -36,4 +36,9 @@ public class CuentaRepositoryAdapter implements CuentaRepositoryPort {
     public boolean existsByNumeroCuenta(String numeroCuenta) {
         return jpaRepository.existsByNumeroCuenta(numeroCuenta);
     }
+
+    @Override
+    public Optional<Cuenta> findByNumeroCuenta(String numeroCuenta) {
+        return jpaRepository.findByNumeroCuenta(numeroCuenta);
+    }
 }

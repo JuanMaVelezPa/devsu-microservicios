@@ -121,9 +121,9 @@ POST/GET/PUT `/api/cuentas`; validar cliente_referencia activo.
 
 POST/GET `/api/movimientos`; F3: 422, `SALDO_NO_DISPONIBLE`, `"Saldo no disponible"`.
 
-- [ ] Deposito/retiro actualizan saldo
-- [ ] Retiro excesivo no persiste
-- [ ] Caso 4 Anexo A
+- [x] Deposito/retiro actualizan saldo
+- [x] Retiro excesivo no persiste
+- [x] Caso 4 Anexo A
 
 ---
 
@@ -175,6 +175,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F5 | [x] Completo |
 | F6 | [x] Completo |
 | F7 | [x] Completo |
-| F8-F12 | [ ] Pendiente |
+| F8 | [x] Completo |
+| F9-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

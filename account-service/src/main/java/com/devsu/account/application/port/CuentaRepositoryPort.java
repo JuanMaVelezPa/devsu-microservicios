@@ -15,4 +15,6 @@ public interface CuentaRepositoryPort {
     Page<Cuenta> findAll(Pageable pageable);
 
     boolean existsByNumeroCuenta(String numeroCuenta);
+
+    Optional<Cuenta> findByNumeroCuenta(String numeroCuenta);
 }
