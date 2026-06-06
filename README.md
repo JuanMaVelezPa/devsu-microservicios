@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F3 completada - Maven multi-modulo, plataforma API, Docker infra. Implementacion en fases F4-F12. |
+| **Estado** | F4 completada - CRUD clientes + Postman. Siguiente: F5 Outbox/Kafka. |
 
 ---
 
@@ -21,6 +21,45 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 Los servicios **no se llaman por REST entre si**. Los cambios de cliente se propagan por **eventos Kafka**; account-service mantiene una proyeccion local (`cliente_referencia`) para validar cuentas y reportes.
 
 Documentacion tecnica: [documentation/instructions.md](documentation/instructions.md) | Indice: [documentation/README.md](documentation/README.md).
+
+---
+
+## URLs de acceso (con Docker + apps arriba)
+
+Requisito previo: `docker compose up -d` y microservicios en local (`spring-boot:run` hasta F10).
+
+| Que | URL |
+|---|---|
+| **client-service** - API REST | http://localhost:8081/api |
+| **client-service** - Swagger UI | http://localhost:8081/swagger-ui.html |
+| **account-service** - API REST | http://localhost:8082/api |
+| **account-service** - Swagger UI | http://localhost:8082/swagger-ui.html |
+| **Grafana** (admin/admin) | http://localhost:3000 |
+| **Prometheus** | http://localhost:9090 |
+
+### Endpoints API (contrato final)
+
+**client-service :8081**
+
+| Metodo | Path |
+|---|---|
+| GET | `/api/health` |
+| POST | `/api/clientes` |
+| GET | `/api/clientes` (page, size) |
+| GET | `/api/clientes/{id}` |
+| PUT | `/api/clientes/{id}` |
+| DELETE | `/api/clientes/{id}` (baja logica) |
+
+**account-service :8082** *(F7-F9)*
+
+| Metodo | Path |
+|---|---|
+| GET | `/api/health` |
+| POST/GET/PUT | `/api/cuentas` |
+| POST/GET | `/api/movimientos` |
+| GET | `/api/reportes?fechaDesde=&fechaHasta=&cliente=` |
+
+Todas las respuestas usan envelope `ApiResponse` con header opcional `X-Correlation-Id`.
 
 ---
 
@@ -47,9 +86,7 @@ Documentacion tecnica: [documentation/instructions.md](documentation/instruction
 Devsu/
 |-- pom.xml
 |-- mvnw / mvnw.cmd
-|-- .mvn/wrapper/
 |-- README.md
-|-- .gitignore
 |-- documentation/
 |-- client-service/
 |-- account-service/
@@ -57,7 +94,7 @@ Devsu/
 |-- BaseDatos.sql
 |-- .env.example
 |-- infra/
-|-- postman/                  (F12)
+|-- postman/
 ```
 
 ---
@@ -65,27 +102,33 @@ Devsu/
 ## Como compilar y probar
 
 ```bash
-./mvnw clean verify          # compilar + tests (ambos servicios)
-./mvnw test                  # solo tests
+./mvnw clean verify
+./mvnw test
 ```
 
-## Como ejecutar infra (F3)
+## Como ejecutar
+
+**1. Infra (PostgreSQL, Kafka, Prometheus, Grafana)**
 
 ```bash
 copy .env.example .env
 docker compose up -d
 ```
 
-Servicios de infra: PostgreSQL :5432, Kafka :9092, Prometheus :9090, Grafana :3000 (admin/admin por defecto en `.env.example`).
+**2. Microservicios** (local, hasta F10 en contenedor)
 
-Microservicios (local, hasta F10):
+Variables de BD: el `application.yml` usa por defecto `localhost:5432` y credenciales de `.env.example`. Spring Boot **no** carga el archivo `.env`; si exportaste vars, usa `POSTGRES_HOST=localhost` para ejecucion local.
 
 ```bash
 ./mvnw -pl client-service spring-boot:run    # :8081
 ./mvnw -pl account-service spring-boot:run   # :8082
 ```
 
-Flujo de prueba Casos 1-5: [documentation/instructions.md](documentation/instructions.md).
+**3. Postman**
+
+Importar `postman/Devsu.postman_collection.json` y `postman/Devsu-Local.postman_environment.json`. Carpeta **F4 - Caso 1** crea los 3 clientes del Anexo A.
+
+Flujo completo Casos 1-5: [documentation/instructions.md](documentation/instructions.md).
 
 ---
 
@@ -97,22 +140,6 @@ Flujo de prueba Casos 1-5: [documentation/instructions.md](documentation/instruc
 | [documentation/data-model.md](documentation/data-model.md) | Modelo ER y SQL |
 | [documentation/implementation-phases.md](documentation/implementation-phases.md) | Roadmap F0-F12 |
 | [documentation/evaluation.md](documentation/evaluation.md) | Checklist pre-entrega |
-
----
-
-## Desarrollo asistido por IA (AI Engineering)
-
-Enfoque **dirigido por el desarrollador**: la IA asiste en estructuracion, redaccion e implementacion bajo spec; **las decisiones de arquitectura, contrato y trade-offs son del autor**.
-
-| Etapa | Decision (humano) | Asistencia IA |
-|---|---|---|
-| Requisitos | Priorizar entregables del reto | Organizar y contrastar requisitos |
-| Arquitectura | Stack, Kafka+Outbox, schemas | Proponer alternativas; consistencia en docs |
-| Contrato API | Validar alineacion con el reto | Tablas, ejemplos, revision |
-| Implementacion | Aprobar cada fase; revisar codigo | Codificar segun documentacion |
-| Entrega | Checklist y defensa tecnica | Tareas repetitivas bajo supervision |
-
-La carpeta `documentation/` documenta el proceso y las decisiones para la entrevista tecnica.
 
 ---
 

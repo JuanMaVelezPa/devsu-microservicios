@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "Devsu - Microservicios bancarios",
+    "description": "Coleccion Postman del reto Devsu. F4: CRUD clientes (Caso 1 Anexo A).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "clientBaseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "accountBaseUrl",
+      "value": "http://localhost:8082"
+    }
+  ],
+  "item": [
+    {
+      "name": "client-service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{clientBaseUrl}}/api/health"
+          }
+        },
+        {
+          "name": "F4 - Caso 1 - Crear clientes Anexo A",
+          "item": [
+            {
+              "name": "POST Jose Lema",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Jose Lema\",\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"1234\",\n  \"estado\": true\n}"
+                },
+                "url": "{{clientBaseUrl}}/api/clientes"
+              }
+            },
+            {
+              "name": "POST Marianela Montalvo",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Marianela Montalvo\",\n  \"identificacion\": \"0987654321\",\n  \"direccion\": \"Amazonas y NNUU\",\n  \"telefono\": \"097548965\",\n  \"contrasena\": \"5678\",\n  \"estado\": true\n}"
+                },
+                "url": "{{clientBaseUrl}}/api/clientes"
+              }
+            },
+            {
+              "name": "POST Juan Osorio",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Juan Osorio\",\n  \"identificacion\": \"1122334455\",\n  \"direccion\": \"13 junio y Equinoccial\",\n  \"telefono\": \"098874587\",\n  \"contrasena\": \"1245\",\n  \"estado\": true\n}"
+                },
+                "url": "{{clientBaseUrl}}/api/clientes"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET listar clientes (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{clientBaseUrl}}/api/clientes?page=0&size=20",
+              "host": ["{{clientBaseUrl}}"],
+              "path": ["api", "clientes"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET cliente por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{clientBaseUrl}}/api/clientes/1"
+          }
+        },
+        {
+          "name": "PUT actualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Jose Lema\",\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"5678\",\n  \"estado\": true\n}"
+            },
+            "url": "{{clientBaseUrl}}/api/clientes/1"
+          }
+        },
+        {
+          "name": "DELETE baja logica cliente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{clientBaseUrl}}/api/clientes/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "account-service",
+      "description": "Endpoints F7-F9 (pendientes). Health disponible.",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{accountBaseUrl}}/api/health"
+          }
+        }
+      ]
+    }
+  ]
+}

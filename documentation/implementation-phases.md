@@ -79,9 +79,9 @@ Ref: [instructions sec. 4.2-4.4](instructions.md#42-envelope-y-http-adr-11)
 
 JPA JOINED, CRUD `/api/clientes`, BCrypt, paginacion, DELETE logico.
 
-- [ ] CRUD con envelope + PageResponse
-- [ ] contrasena hasheada en BD
-- [ ] Caso 1 Anexo A
+- [x] CRUD con envelope + PageResponse
+- [x] contrasena hasheada en BD
+- [x] Caso 1 Anexo A (Postman)
 
 Ref: [instructions sec. 5](instructions.md#5-dtos-y-recursos)
 
@@ -171,6 +171,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F1 | [x] Completo |
 | F2 | [x] Completo |
 | F3 | [x] Completo |
-| F4-F12 | [ ] Pendiente |
+| F4 | [x] Completo |
+| F5-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

@@ -9,4 +9,4 @@
 
 **Fuente de verdad por tema:** ADR y API -> instructions | BD -> data-model | Fases -> implementation-phases | Verificar entrega -> evaluation.
 
-Estado: F3 completada (Docker infra + BaseDatos.sql). Entrada: [README.md](../README.md).
+Estado: F4 completada (CRUD clientes + Postman). Entrada: [README.md](../README.md).

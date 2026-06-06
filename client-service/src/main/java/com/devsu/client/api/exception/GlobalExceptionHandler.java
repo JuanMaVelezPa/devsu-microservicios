@@ -2,10 +2,12 @@ package com.devsu.client.api.exception;
 
 import com.devsu.client.api.context.CorrelationContext;
 import com.devsu.client.api.dto.ApiResponse;
+import com.devsu.client.domain.exception.ClienteDuplicadoException;
 import com.devsu.client.domain.exception.DomainException;
 import com.devsu.client.domain.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,9 +24,26 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, ex);
     }
 
+    @ExceptionHandler(ClienteDuplicadoException.class)
+    public ResponseEntity<ApiResponse<Void>> handleClienteDuplicado(ClienteDuplicadoException ex) {
+        return buildError(HttpStatus.CONFLICT, ex);
+    }
+
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<ApiResponse<Void>> handleDomainException(DomainException ex) {
         return buildError(HttpStatus.UNPROCESSABLE_CONTENT, ex);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("VALIDATION_ERROR", ex.getMessage(), CorrelationContext.get()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("CLIENTE_DUPLICADO", "Identificacion duplicada", CorrelationContext.get()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
