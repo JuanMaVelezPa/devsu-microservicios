@@ -1,0 +1,37 @@
+{
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-25",
+      "path": "C:\\Program Files\\Java\\jdk-25.0.1",
+      "default": true
+    }
+  ],
+  "java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-25.0.1",
+  "java.import.gradle.java.home": "C:\\Program Files\\Java\\jdk-25.0.1",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "automatic",
+  "files.exclude": {
+    "**/.gradle": true,
+    "**/build": true
+  },
+  "terminal.integrated.env.windows": {
+    "JAVA_HOME": "C:\\Program Files\\Java\\jdk-25.0.1",
+    "GRADLE_HOME": "C:\\Program Files\\gradle-9.5.1",
+    "PATH": "C:\\Program Files\\gradle-9.5.1\\bin;C:\\Program Files\\Java\\jdk-25.0.1\\bin;${env:PATH}"
+  },
+  "java.test.defaultConfig": "devsu-tests",
+  "java.test.config": [
+    {
+      "name": "devsu-tests",
+      "workingDirectory": "${workspaceFolder}"
+    }
+  ],
+  "[java]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": false
+  },
+  "spring-boot.ls.java.home": "C:\\Program Files\\Java\\jdk-25.0.1"
+}

@@ -1,0 +1,4 @@
+rootProject.name = 'devsu'
+
+include 'client-service'
+include 'account-service'

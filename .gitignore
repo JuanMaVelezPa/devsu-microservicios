@@ -31,7 +31,11 @@ out/
 .project
 .classpath
 .settings/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 *.swp
 *~
 

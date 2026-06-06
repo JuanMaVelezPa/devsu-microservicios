@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Client Service (:8081)",
+      "request": "launch",
+      "mainClass": "com.devsu.client.ClientServiceApplication",
+      "projectName": "client-service",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Account Service (:8082)",
+      "request": "launch",
+      "mainClass": "com.devsu.account.AccountServiceApplication",
+      "projectName": "account-service",
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Both Services",
+      "configurations": [
+        "Client Service (:8081)",
+        "Account Service (:8082)"
+      ],
+      "stopAll": true
+    }
+  ]
+}

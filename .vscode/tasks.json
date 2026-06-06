@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Gradle: build",
+      "type": "shell",
+      "command": ".\\gradlew.bat",
+      "args": ["build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Gradle: test",
+      "type": "shell",
+      "command": ".\\gradlew.bat",
+      "args": ["test"],
+      "group": "test",
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Gradle: client-service bootRun",
+      "type": "shell",
+      "command": ".\\gradlew.bat",
+      "args": [":client-service:bootRun"],
+      "isBackground": true,
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Gradle: account-service bootRun",
+      "type": "shell",
+      "command": ".\\gradlew.bat",
+      "args": [":account-service:bootRun"],
+      "isBackground": true,
+      "problemMatcher": ["$gradle"]
+    }
+  ]
+}
