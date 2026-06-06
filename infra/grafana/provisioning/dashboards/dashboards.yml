@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Devsu
+    orgId: 1
+    folder: Devsu
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

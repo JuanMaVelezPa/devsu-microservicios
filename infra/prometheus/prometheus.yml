@@ -7,12 +7,12 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  # F10: descomentar cuando client-service y account-service esten en compose
-  # - job_name: client-service
-  #   metrics_path: /actuator/prometheus
-  #   static_configs:
-  #     - targets: ["client-service:8081"]
-  # - job_name: account-service
-  #   metrics_path: /actuator/prometheus
-  #   static_configs:
-  #     - targets: ["account-service:8082"]
+  - job_name: client-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["client-service:8081"]
+
+  - job_name: account-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["account-service:8082"]

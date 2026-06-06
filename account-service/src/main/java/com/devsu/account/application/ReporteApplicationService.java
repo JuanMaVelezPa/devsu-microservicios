@@ -11,6 +11,7 @@ import com.devsu.account.domain.exception.ClienteNotFoundException;
 import com.devsu.account.domain.model.ClienteReferencia;
 import com.devsu.account.domain.model.Cuenta;
 import com.devsu.account.domain.model.Movimiento;
+import com.devsu.account.infrastructure.observability.BusinessMetrics;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +24,17 @@ public class ReporteApplicationService {
     private final ClienteReferenciaRepositoryPort clienteReferenciaRepository;
     private final CuentaRepositoryPort cuentaRepository;
     private final MovimientoRepositoryPort movimientoRepository;
+    private final BusinessMetrics businessMetrics;
 
     public ReporteApplicationService(
             ClienteReferenciaRepositoryPort clienteReferenciaRepository,
             CuentaRepositoryPort cuentaRepository,
-            MovimientoRepositoryPort movimientoRepository) {
+            MovimientoRepositoryPort movimientoRepository,
+            BusinessMetrics businessMetrics) {
         this.clienteReferenciaRepository = clienteReferenciaRepository;
         this.cuentaRepository = cuentaRepository;
         this.movimientoRepository = movimientoRepository;
+        this.businessMetrics = businessMetrics;
     }
 
     public ReporteView generate(ReporteQuery query) {
@@ -43,6 +47,7 @@ public class ReporteApplicationService {
                 .map(cuenta -> toCuentaReporteView(cuenta, query))
                 .toList();
 
+        businessMetrics.incrementReporteGenerado();
         return new ReporteView(
                 cliente.getNombre(),
                 query.fechaDesde(),

@@ -69,7 +69,7 @@ flowchart TB
 
 Capas por servicio (`domain` -> `application` -> `infrastructure` -> `api`). Repository pattern: puerto en application, JpaRepository en infrastructure.
 
-Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`. Entrada al proyecto: [README.md](../README.md). Estado: F9 completada (API F4-F9 + Postman Casos 1-5; pendiente F10 apps en Docker).
+Estructura repo planificada: monorepo Maven con `pom.xml`, `client-service/`, `account-service/`, `docker-compose.yml`, `BaseDatos.sql`, `postman/`, `documentation/`, `infra/` (Prometheus/Grafana). Entrada al proyecto: [README.md](../README.md). Estado: **F10 completada** (stack Docker full + Micrometer/Prometheus/Grafana + dashboard de negocio). Siguiente: F11-F12 entrega.
 
 ---
 
@@ -226,7 +226,7 @@ Ejemplo Caso 5: `GET /api/reportes?fechaDesde=2022-02-01&fechaHasta=2022-02-28&c
 ## 6. Calidad, infra y pruebas
 
 - **Pruebas:** JUnit 5 + Mockito (min. 1 test Cliente); Testcontainers bonus; Postman Anexo A.
-- **Observabilidad:** Micrometer -> `/actuator/prometheus`; Grafana; ADR-12 logs.
+- **Observabilidad (F10):** Micrometer counters `devsu.*` (`BusinessMetrics`) -> `/actuator/prometheus`; scrape Prometheus (`infra/prometheus/prometheus.yml`); dashboard Grafana provisionado (`infra/grafana/`). Ver [README.md](../README.md#observabilidad-micrometer--prometheus--grafana).
 - **Java 25:** Records en DTOs; sealed classes opcional en excepciones; entidades JPA como clases.
 - **Docker (ADR-13):** `.env.example` -> `.env` -> `docker compose up`. Variables: POSTGRES_*, KAFKA_PORT, GRAFANA_*, PROMETHEUS_PORT, CLIENT/ACCOUNT_SERVICE_PORT, KAFKA_TOPIC_CLIENT_EVENTS.
 - **Contenedores:** client-service, account-service, postgres, kafka, prometheus, grafana.

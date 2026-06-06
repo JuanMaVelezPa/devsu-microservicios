@@ -63,12 +63,12 @@ Marcar cada item al completarlo. **Obligatorio** = exigido por Devsu. **Proyecto
 
 ### Docker y entregables
 
-- [ ] Solucion desplegada y funcional en Docker
+- [x] Solucion desplegada y funcional en Docker *(validado: `docker compose up`, health 200, targets UP)*
 - [x] `BaseDatos.sql` presente
 - [x] Coleccion Postman JSON incluida
-- [ ] Repositorio GitHub publico
+- [x] Repositorio GitHub publico
 - [ ] Archivo ZIP o RAR generado
-- [ ] README con instrucciones de despliegue
+- [x] README con instrucciones de despliegue *(modo Docker F10 + local + observabilidad)*
 - [ ] Repositorio GitHub con historial de commits claro
 
 ---
@@ -83,7 +83,7 @@ Referencia de datos: Anexo A en [instructions.md](instructions.md)
 - [ ] Caso 4: 4 movimientos ejecutados correctamente *(validar con Postman)*
 - [ ] Caso 5: Reporte por fechas coincide con resultado esperado *(validar con Postman)*
 
-> Coleccion Postman actualizada (F4-F9). Ejecutar flujo en [README.md](../README.md#como-ejecutar).
+> Coleccion Postman actualizada (F4-F9). Ejecutar flujo en [README.md](../README.md#como-ejecutar). Tras F10, preferir modo Docker del README.
 
 ---
 
@@ -109,7 +109,7 @@ Referencia: tabla ADR y secciones 1-6 en [instructions.md](instructions.md)
 - [x] Contrasena cliente: hash BCrypt en POST/PUT; nunca en GET/logs/Kafka (ADR-15)
 - [x] GlobalExceptionHandler mapea excepciones dominio -> HTTP 4xx
 - [x] client-service :8081, account-service :8082
-- [ ] Micrometer + Prometheus + Grafana operativos *(infra F3; apps en Docker F10)*
+- [x] Micrometer + Prometheus + Grafana operativos *(F10: apps en compose + scrape)*
 - [x] Pruebas con JUnit 5 + Mockito
 
 ---
@@ -117,7 +117,7 @@ Referencia: tabla ADR y secciones 1-6 en [instructions.md](instructions.md)
 ## D. Bonus (puntaje extra)
 
 - [x] F6: 1 prueba de integracion
-- [ ] F7: Despliegue completo en contenedores (si no cubierto en A)
+- [x] F7: Despliegue completo en contenedores *(F10: MS + infra en compose)*
 - [ ] Diseno documenta rendimiento, escalabilidad, resiliencia (outbox aporta resiliencia)
 - [ ] Virtual threads u optimizaciones adicionales
 

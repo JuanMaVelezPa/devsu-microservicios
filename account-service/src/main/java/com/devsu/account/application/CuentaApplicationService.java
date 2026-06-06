@@ -13,6 +13,7 @@ import com.devsu.account.domain.exception.CuentaNotFoundException;
 import com.devsu.account.domain.model.ClienteReferencia;
 import com.devsu.account.domain.model.Cuenta;
 import com.devsu.account.domain.model.EstadoCuenta;
+import com.devsu.account.infrastructure.observability.BusinessMetrics;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,12 +29,15 @@ public class CuentaApplicationService {
 
     private final CuentaRepositoryPort cuentaRepository;
     private final ClienteReferenciaRepositoryPort clienteReferenciaRepository;
+    private final BusinessMetrics businessMetrics;
 
     public CuentaApplicationService(
             CuentaRepositoryPort cuentaRepository,
-            ClienteReferenciaRepositoryPort clienteReferenciaRepository) {
+            ClienteReferenciaRepositoryPort clienteReferenciaRepository,
+            BusinessMetrics businessMetrics) {
         this.cuentaRepository = cuentaRepository;
         this.clienteReferenciaRepository = clienteReferenciaRepository;
+        this.businessMetrics = businessMetrics;
     }
 
     public CuentaView create(CuentaCommand command) {
@@ -48,7 +52,9 @@ public class CuentaApplicationService {
         cuenta.setTipoCuenta(command.tipoCuenta());
         cuenta.setSaldo(command.saldoInicial());
         cuenta.setEstado(command.estado() != null ? command.estado() : EstadoCuenta.ACTIVA);
-        return toView(cuentaRepository.save(cuenta));
+        Cuenta saved = cuentaRepository.save(cuenta);
+        businessMetrics.incrementCuentaOperacion("create");
+        return toView(saved);
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +81,9 @@ public class CuentaApplicationService {
         Cuenta cuenta = findCuentaOrThrow(id);
         cuenta.setTipoCuenta(command.tipoCuenta());
         cuenta.setEstado(command.estado());
-        return toView(cuentaRepository.save(cuenta));
+        Cuenta saved = cuentaRepository.save(cuenta);
+        businessMetrics.incrementCuentaOperacion("update");
+        return toView(saved);
     }
 
     public void validatePagination(int page, int size) {

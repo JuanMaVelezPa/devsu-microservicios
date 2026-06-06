@@ -8,6 +8,10 @@ import com.devsu.account.api.dto.CuentaUpdateRequest;
 import com.devsu.account.api.dto.PageResponse;
 import com.devsu.account.api.mapper.CuentaApiMapper;
 import com.devsu.account.application.CuentaApplicationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/cuentas")
+@Tag(name = "Cuentas", description = "CRU de cuentas bancarias (sin DELETE). Requiere cliente_referencia sincronizada por Kafka.")
 public class CuentaController {
 
     private final CuentaApplicationService cuentaService;
@@ -31,6 +36,14 @@ public class CuentaController {
     }
 
     @PostMapping
+    @Operation(summary = "Crear cuenta", description = "Valida que el clienteId exista en cliente_referencia y este activo.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Cuenta creada"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "VALIDATION_ERROR"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "CLIENTE_NOT_FOUND - sin proyeccion Kafka"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "CUENTA_DUPLICADA - numeroCuenta repetido"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "422", description = "CLIENTE_INACTIVO")
+    })
     public ResponseEntity<ApiResponse<CuentaResponse>> create(@Valid @RequestBody CuentaRequest request) {
         CuentaResponse response = CuentaApiMapper.toResponse(
                 cuentaService.create(CuentaApiMapper.toCommand(request)));
@@ -39,9 +52,14 @@ public class CuentaController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar cuentas", description = "Paginacion: page (base 0), size (default 20, max 100).")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Listado paginado"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "VALIDATION_ERROR")
+    })
     public ApiResponse<PageResponse<CuentaResponse>> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @Parameter(example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(example = "20") @RequestParam(defaultValue = "20") int size) {
         cuentaService.validatePagination(page, size);
         return ApiResponse.success(
                 CuentaApiMapper.toPageResponse(cuentaService.list(page, size)),
@@ -49,13 +67,25 @@ public class CuentaController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<CuentaResponse> getById(@PathVariable Long id) {
+    @Operation(summary = "Obtener cuenta por ID")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Cuenta encontrada"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "CUENTA_NOT_FOUND")
+    })
+    public ApiResponse<CuentaResponse> getById(
+            @Parameter(example = "1") @PathVariable Long id) {
         return ApiResponse.success(
                 CuentaApiMapper.toResponse(cuentaService.getById(id)),
                 CorrelationContext.get());
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar cuenta", description = "Permite cambiar tipoCuenta y estado (CRU sin delete).")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Cuenta actualizada"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "VALIDATION_ERROR"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "CUENTA_NOT_FOUND")
+    })
     public ApiResponse<CuentaResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody CuentaUpdateRequest request) {

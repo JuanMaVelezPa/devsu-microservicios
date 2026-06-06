@@ -10,7 +10,6 @@ services:
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
-      # PG 18+: volumen en /var/lib/postgresql (no /data)
       - postgres_data:/var/lib/postgresql
       - ./BaseDatos.sql:/docker-entrypoint-initdb.d/01-base-datos.sql:ro
     healthcheck:
@@ -28,11 +27,12 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      # PLAINTEXT: red Docker (MS). PLAINTEXT_HOST: host (spring-boot:run local).
+      KAFKA_LISTENERS: PLAINTEXT://:29092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -44,6 +44,46 @@ services:
       timeout: 10s
       retries: 10
       start_period: 30s
+
+  client-service:
+    build:
+      context: .
+      dockerfile: client-service/Dockerfile
+    container_name: devsu-client-service
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      KAFKA_BROKER: kafka:29092
+    ports:
+      - "${CLIENT_SERVICE_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: on-failure
+
+  account-service:
+    build:
+      context: .
+      dockerfile: account-service/Dockerfile
+    container_name: devsu-account-service
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      KAFKA_BROKER: kafka:29092
+    ports:
+      - "${ACCOUNT_SERVICE_PORT:-8082}:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      client-service:
+        condition: service_started
+    restart: on-failure
 
   prometheus:
     image: prom/prometheus:v3.12.0
@@ -57,6 +97,11 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --web.enable-lifecycle
+    depends_on:
+      client-service:
+        condition: service_started
+      account-service:
+        condition: service_started
 
   grafana:
     image: grafana/grafana:13.0.1

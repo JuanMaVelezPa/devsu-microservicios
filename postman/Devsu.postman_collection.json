@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Devsu - Microservicios bancarios",
-    "description": "Coleccion Postman del reto Devsu (F4-F9).\n\n**Flujo rapido Anexo A (Casos 1-5):**\n1. client-service > F4 - Caso 1 (3 POST clientes)\n2. Esperar ~5 s (sync Kafka -> cliente_referencia)\n3. account-service > F7 - Caso 2 (4 cuentas)\n4. account-service > F7 - Caso 3 (cuenta 585545)\n5. account-service > F8 - Caso 4 (4 movimientos)\n6. account-service > F9 - Caso 5 (GET reporte)\n\nRequisitos: Docker (postgres+kafka), client-service :8081, account-service :8082.\nVariables de entorno: Devsu-Local.postman_environment.json",
+    "description": "Coleccion Postman del reto Devsu (F4-F9).\n\n**Flujo rapido Anexo A (Casos 1-5):**\n1. client-service > F4 - Caso 1 (3 POST clientes)\n2. Esperar ~5 s (sync Kafka -> cliente_referencia)\n3. account-service > F7 - Caso 2 (4 cuentas)\n4. account-service > F7 - Caso 3 (cuenta 585545)\n5. account-service > F8 - Caso 4 (4 movimientos)\n6. account-service > F9 - Caso 5 (GET reporte Marianela; incluye tests automaticos)\n\nRequisitos: `docker compose up -d --build` (F10) o apps locales :8081/:8082.\nVariables: Devsu-Local.postman_environment.json",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -112,6 +112,39 @@
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"nombre\": \"Juan Osorio\",\n  \"identificacion\": \"1122334455\",\n  \"direccion\": \"13 junio y Equinoccial\",\n  \"telefono\": \"098874587\",\n  \"contrasena\": \"1245\",\n  \"estado\": true\n}"
+                },
+                "url": "{{clientBaseUrl}}/api/clientes"
+              }
+            }
+          ]
+        },
+        {
+          "name": "F4 - Clientes (utilidades)",
+          "item": [
+            {
+              "name": "POST identificacion duplicada (409 CLIENTE_DUPLICADO)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                      "const res = pm.response.json();",
+                      "pm.test('CLIENTE_DUPLICADO', () => {",
+                      "  pm.expect(res.success).to.be.false;",
+                      "  pm.expect(res.error.code).to.eql('CLIENTE_DUPLICADO');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Duplicado Test\",\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Calle Test\",\n  \"telefono\": \"099999999\",\n  \"contrasena\": \"9999\",\n  \"estado\": true\n}"
                 },
                 "url": "{{clientBaseUrl}}/api/clientes"
               }
@@ -451,6 +484,38 @@
           "item": [
             {
               "name": "GET Reporte Marianela Montalvo feb-2022",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const res = pm.response.json();",
+                      "pm.test('success true', () => pm.expect(res.success).to.be.true);",
+                      "pm.test('cliente Marianela Montalvo', () => pm.expect(res.data.cliente).to.eql('Marianela Montalvo'));",
+                      "const cuentas = res.data.cuentas;",
+                      "pm.test('2 cuentas en reporte', () => pm.expect(cuentas).to.have.lengthOf(2));",
+                      "const c225 = cuentas.find(c => c.numeroCuenta === '225487');",
+                      "const c496 = cuentas.find(c => c.numeroCuenta === '496825');",
+                      "pm.test('cuenta 225487 saldo 700 y deposito 600', () => {",
+                      "  pm.expect(c225).to.exist;",
+                      "  pm.expect(c225.saldoActual).to.eql(700);",
+                      "  pm.expect(c225.movimientos[0].fecha).to.eql('2022-02-10');",
+                      "  pm.expect(c225.movimientos[0].valor).to.eql(600);",
+                      "  pm.expect(c225.movimientos[0].saldoResultante).to.eql(700);",
+                      "});",
+                      "pm.test('cuenta 496825 saldo 0 y retiro 540', () => {",
+                      "  pm.expect(c496).to.exist;",
+                      "  pm.expect(c496.saldoActual).to.eql(0);",
+                      "  pm.expect(c496.movimientos[0].fecha).to.eql('2022-02-08');",
+                      "  pm.expect(c496.movimientos[0].valor).to.eql(-540);",
+                      "  pm.expect(c496.movimientos[0].saldoResultante).to.eql(0);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
               "request": {
                 "method": "GET",
                 "header": [],

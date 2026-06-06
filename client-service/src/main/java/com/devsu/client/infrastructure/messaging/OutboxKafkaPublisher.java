@@ -1,6 +1,7 @@
 package com.devsu.client.infrastructure.messaging;
 
 import com.devsu.client.infrastructure.config.DevsuProperties;
+import com.devsu.client.infrastructure.observability.BusinessMetrics;
 import com.devsu.client.infrastructure.persistence.OutboxEvent;
 import com.devsu.client.infrastructure.persistence.OutboxEventJpaRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,18 +32,21 @@ public class OutboxKafkaPublisher {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final String topic;
+    private final BusinessMetrics businessMetrics;
 
     public OutboxKafkaPublisher(
             OutboxEventJpaRepository outboxRepository,
             OutboxEventMarker outboxEventMarker,
             KafkaTemplate<String, String> kafkaTemplate,
             ObjectMapper objectMapper,
-            DevsuProperties devsuProperties) {
+            DevsuProperties devsuProperties,
+            BusinessMetrics businessMetrics) {
         this.outboxRepository = outboxRepository;
         this.outboxEventMarker = outboxEventMarker;
         this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = objectMapper;
         this.topic = devsuProperties.getKafka().getTopicClientEvents();
+        this.businessMetrics = businessMetrics;
     }
 
     @Scheduled(fixedDelayString = "${devsu.outbox.publish-interval-ms:3000}")
@@ -69,6 +73,7 @@ public class OutboxKafkaPublisher {
 
             kafkaTemplate.send(record).get();
             outboxEventMarker.markPublished(event.getId());
+            businessMetrics.incrementOutboxPublicado(event.getEventType());
             log.info(
                     "Outbox publicado: eventId={} eventType={} aggregateId={}",
                     event.getId(),

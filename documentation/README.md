@@ -9,4 +9,4 @@
 
 **Fuente de verdad por tema:** ADR y API -> instructions | BD -> data-model | Fases -> implementation-phases | Verificar entrega -> evaluation.
 
-Estado: F9 completada (F4-F9 API + Postman Anexo A). Entrada: [README.md](../README.md).
+Estado: F10 completada (stack Docker + Prometheus/Grafana + metricas `devsu.*`). Observabilidad: [README.md](../README.md#observabilidad-micrometer--prometheus--grafana). Entrada: [README.md](../README.md).

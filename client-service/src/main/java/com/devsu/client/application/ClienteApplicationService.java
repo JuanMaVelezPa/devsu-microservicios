@@ -8,6 +8,7 @@ import com.devsu.client.application.port.ClienteRepositoryPort;
 import com.devsu.client.domain.exception.ClienteDuplicadoException;
 import com.devsu.client.domain.exception.ClienteNotFoundException;
 import com.devsu.client.domain.model.Cliente;
+import com.devsu.client.infrastructure.observability.BusinessMetrics;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,14 +26,17 @@ public class ClienteApplicationService {
     private final ClienteRepositoryPort clienteRepository;
     private final ClienteOutboxPort clienteOutboxPort;
     private final PasswordEncoder passwordEncoder;
+    private final BusinessMetrics businessMetrics;
 
     public ClienteApplicationService(
             ClienteRepositoryPort clienteRepository,
             ClienteOutboxPort clienteOutboxPort,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            BusinessMetrics businessMetrics) {
         this.clienteRepository = clienteRepository;
         this.clienteOutboxPort = clienteOutboxPort;
         this.passwordEncoder = passwordEncoder;
+        this.businessMetrics = businessMetrics;
     }
 
     public ClienteView create(ClienteCommand command) {
@@ -44,6 +48,7 @@ public class ClienteApplicationService {
         cliente.setContrasena(passwordEncoder.encode(command.contrasena()));
         cliente = clienteRepository.save(cliente);
         clienteOutboxPort.enqueueCreated(cliente);
+        businessMetrics.incrementClienteOperacion("create");
         return toView(cliente);
     }
 
@@ -77,6 +82,7 @@ public class ClienteApplicationService {
         cliente.setEstado(command.estado());
         cliente = clienteRepository.save(cliente);
         clienteOutboxPort.enqueueUpdated(cliente);
+        businessMetrics.incrementClienteOperacion("update");
         return toView(cliente);
     }
 
@@ -85,6 +91,7 @@ public class ClienteApplicationService {
         cliente.setEstado(false);
         cliente = clienteRepository.save(cliente);
         clienteOutboxPort.enqueueDeleted(cliente.getId());
+        businessMetrics.incrementClienteOperacion("delete");
         return toView(cliente);
     }
 

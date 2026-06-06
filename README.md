@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | [juanmavelezpa@gmail.com](mailto:juanmavelezpa@gmail.com) |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F9 completada - reportes por cliente y rango de fechas. Siguiente: F10 Observabilidad Docker. |
+| **Estado** | F10 completada - Docker full stack, Micrometer + dashboard Grafana de negocio. Siguiente: F11-F12 entrega. |
 
 ---
 
@@ -24,16 +24,20 @@ Documentacion tecnica: [documentation/instructions.md](documentation/instruction
 
 ---
 
-## URLs de acceso (con Docker + apps arriba)
+## URLs de acceso (Docker Compose F10)
 
-Requisito previo: `docker compose up -d` y microservicios en local (`spring-boot:run` hasta F10).
+Requisito previo: `copy .env.example .env` y `docker compose up -d --build`.
 
 | Que | URL |
 |---|---|
 | **client-service** - API REST | http://localhost:8081/api |
 | **client-service** - Swagger UI | http://localhost:8081/swagger-ui.html |
+| **client-service** - OpenAPI JSON | http://localhost:8081/v3/api-docs |
+| **client-service** - Prometheus metrics | http://localhost:8081/actuator/prometheus |
 | **account-service** - API REST | http://localhost:8082/api |
 | **account-service** - Swagger UI | http://localhost:8082/swagger-ui.html |
+| **account-service** - OpenAPI JSON | http://localhost:8082/v3/api-docs |
+| **account-service** - Prometheus metrics | http://localhost:8082/actuator/prometheus |
 | **Grafana** (admin/admin) | http://localhost:3000 |
 | **Prometheus** | http://localhost:9090 |
 
@@ -74,9 +78,60 @@ Todas las respuestas usan envelope `ApiResponse` con header opcional `X-Correlat
 | Mensajeria | Apache Kafka 4.3 + Transactional Outbox |
 | API | REST, envelope `ApiResponse`, OpenAPI (springdoc) |
 | Seguridad datos | BCrypt en contrasena (sin JWT; no exigido por el reto) |
-| Observabilidad | Micrometer, Prometheus 3.12, Grafana 13, logs con `correlationId` |
+| Observabilidad | Micrometer + Actuator, Prometheus 3.12, Grafana 13, logs con `correlationId` |
 | Pruebas | JUnit 5, Mockito, Postman; Testcontainers (bonus) |
 | Runtime | Docker, Docker Compose |
+
+---
+
+## Observabilidad (Micrometer + Prometheus + Grafana)
+
+Stack de metricas de punta a punta: **Micrometer** instrumenta la aplicacion, **Spring Boot Actuator** expone `/actuator/prometheus`, **Prometheus** hace scrape cada 15 s y **Grafana** visualiza un dashboard de negocio provisionado.
+
+```
+Microservicios (Micrometer)  -->  /actuator/prometheus  -->  Prometheus  -->  Grafana
+     client-service :8081              scrape 15s              :9090          :3000
+     account-service :8082
+```
+
+### Componentes
+
+| Pieza | Rol |
+|---|---|
+| **Micrometer** | API de metricas; counters custom `devsu.*` + metricas JVM/HTTP/Hikari/Kafka |
+| **Actuator** | Endpoints `health`, `info`, `prometheus` en ambos servicios |
+| **Prometheus** | Almacena series temporales; config en `infra/prometheus/prometheus.yml` |
+| **Grafana** | Dashboard **Devsu - Negocio bancario** (provisionado en `infra/grafana/`) |
+
+### Metricas de negocio (`devsu.*`)
+
+Counters custom ligados al caso Devsu (prefijo Prometheus: `devsu_*_total`):
+
+| Metrica | Servicio | Descripcion |
+|---|---|---|
+| `devsu_cliente_operaciones{operacion}` | client | CRUD clientes: `create`, `update`, `delete` |
+| `devsu_outbox_publicados{event_type}` | client | Eventos outbox publicados a Kafka |
+| `devsu_cuenta_operaciones{operacion}` | account | Alta/actualizacion de cuentas |
+| `devsu_movimiento_operaciones{tipo}` | account | `deposito` / `retiro` exitosos |
+| `devsu_movimiento_rechazos{motivo}` | account | Rechazos F3 (`saldo_insuficiente`) |
+| `devsu_kafka_eventos_procesados{event_type}` | account | Consumer sincroniza `cliente_referencia` |
+| `devsu_kafka_eventos_duplicados` | account | Idempotencia por `eventId` |
+| `devsu_reporte_generados` | account | Reportes de estado de cuenta generados |
+
+### Metricas de plataforma (automaticas)
+
+Micrometer/Spring Boot tambien exponen: latencia y throughput HTTP (`http_server_requests_*`), memoria JVM, pool HikariCP (PostgreSQL), metricas del producer/consumer Kafka y errores 4xx/5xx por endpoint.
+
+### Como consultar
+
+| Recurso | URL |
+|---|---|
+| Metricas raw client-service | http://localhost:8081/actuator/prometheus |
+| Metricas raw account-service | http://localhost:8082/actuator/prometheus |
+| Targets Prometheus (UP/DOWN) | http://localhost:9090/targets |
+| Dashboard Grafana | http://localhost:3000 → carpeta **Devsu** → **Devsu - Negocio bancario** |
+
+Tras levantar Docker y ejecutar el flujo Postman (Anexo A), las graficas muestran actividad en clientes, cuentas, movimientos, sync Kafka y reportes. Los counters `devsu_*` aparecen en `/actuator/prometheus` tras la primera operacion de cada tipo (Micrometer no expone series en cero).
 
 ---
 
@@ -89,11 +144,16 @@ Devsu/
 |-- README.md
 |-- documentation/
 |-- client-service/
+|   `-- Dockerfile
 |-- account-service/
+|   `-- Dockerfile
 |-- docker-compose.yml
 |-- BaseDatos.sql
 |-- .env.example
+|-- .dockerignore
 |-- infra/
+|   |-- prometheus/prometheus.yml
+|   `-- grafana/provisioning/
 |-- postman/
 ```
 
@@ -108,16 +168,43 @@ Devsu/
 
 ## Como ejecutar
 
-**1. Infra (PostgreSQL, Kafka, Prometheus, Grafana)**
+### Modo Docker (recomendado - F10)
+
+Todo el stack en contenedores: PostgreSQL, Kafka, microservicios, Prometheus y Grafana.
 
 ```bash
 copy .env.example .env
-docker compose up -d
+docker compose up -d --build
 ```
 
-**2. Microservicios** (local, hasta F10 en contenedor)
+Esperar ~1-2 min a que `client-service` y `account-service` pasen healthcheck. Ver estado:
 
-Variables de BD: el `application.yml` usa por defecto `localhost:5433` y credenciales de `.env.example`. Spring Boot **no** carga el archivo `.env`; usa `envFile` en `.vscode/launch.json` o exporta vars (`POSTGRES_HOST=localhost`, `POSTGRES_PORT=5433`).
+```bash
+docker compose ps
+```
+
+**Flujo Anexo A:** importar Postman (`postman/`) y ejecutar carpetas F4 -> F7 -> F8 -> F9 (esperar ~5 s tras crear clientes para sync Kafka).
+
+**Observabilidad:** ver seccion [Observabilidad (Micrometer + Prometheus + Grafana)](#observabilidad-micrometer--prometheus--grafana). Resumen rapido:
+- Prometheus targets: http://localhost:9090/targets (jobs `client-service`, `account-service`)
+- Grafana: http://localhost:3000 (usuario/contrasena en `.env`)
+- Dashboard provisionado: carpeta **Devsu** → **Devsu - Negocio bancario** (metricas de clientes, cuentas, movimientos, Kafka, reportes)
+
+Detener:
+
+```bash
+docker compose down
+```
+
+### Modo local (desarrollo)
+
+Infra en Docker, apps con Maven en el host:
+
+```bash
+docker compose up -d postgres kafka prometheus grafana
+```
+
+Variables en `.env`: `POSTGRES_HOST=localhost`, `POSTGRES_PORT=5433`, `KAFKA_BROKER=localhost:9092`. Spring Boot **no** carga `.env` solo; usa `envFile` en `.vscode/launch.json` o exporta variables.
 
 ```bash
 ./mvnw -pl client-service spring-boot:run    # :8081

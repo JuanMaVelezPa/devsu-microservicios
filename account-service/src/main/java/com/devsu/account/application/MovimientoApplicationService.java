@@ -11,6 +11,7 @@ import com.devsu.account.domain.exception.SaldoNoDisponibleException;
 import com.devsu.account.domain.model.Cuenta;
 import com.devsu.account.domain.model.Movimiento;
 import com.devsu.account.domain.model.TipoMovimiento;
+import com.devsu.account.infrastructure.observability.BusinessMetrics;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,12 +35,15 @@ public class MovimientoApplicationService {
 
     private final MovimientoRepositoryPort movimientoRepository;
     private final CuentaRepositoryPort cuentaRepository;
+    private final BusinessMetrics businessMetrics;
 
     public MovimientoApplicationService(
             MovimientoRepositoryPort movimientoRepository,
-            CuentaRepositoryPort cuentaRepository) {
+            CuentaRepositoryPort cuentaRepository,
+            BusinessMetrics businessMetrics) {
         this.movimientoRepository = movimientoRepository;
         this.cuentaRepository = cuentaRepository;
+        this.businessMetrics = businessMetrics;
     }
 
     public MovimientoView register(MovimientoCommand command) {
@@ -53,6 +57,7 @@ public class MovimientoApplicationService {
         TipoMovimiento tipoMovimiento = resolveTipoMovimiento(command.valor());
 
         if (tipoMovimiento == TipoMovimiento.RETIRO && saldoResultante.compareTo(BigDecimal.ZERO) < 0) {
+            businessMetrics.incrementMovimientoRechazo("saldo_insuficiente");
             throw new SaldoNoDisponibleException();
         }
 
@@ -66,6 +71,7 @@ public class MovimientoApplicationService {
         movimiento.setValor(command.valor());
         movimiento.setSaldoResultante(saldoResultante);
 
+        businessMetrics.incrementMovimiento(tipoMovimiento.name().toLowerCase());
         return toView(movimientoRepository.save(movimiento), cuenta.getNumeroCuenta());
     }
 

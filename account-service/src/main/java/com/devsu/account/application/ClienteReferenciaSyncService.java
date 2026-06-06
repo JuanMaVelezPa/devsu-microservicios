@@ -6,6 +6,7 @@ import com.devsu.account.application.event.ClienteEventType;
 import com.devsu.account.application.port.ClienteReferenciaRepositoryPort;
 import com.devsu.account.application.port.ProcessedEventRepositoryPort;
 import com.devsu.account.domain.model.ClienteReferencia;
+import com.devsu.account.infrastructure.observability.BusinessMetrics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -24,20 +25,24 @@ public class ClienteReferenciaSyncService {
     private final ClienteReferenciaRepositoryPort clienteReferenciaRepository;
     private final ProcessedEventRepositoryPort processedEventRepository;
     private final ObjectMapper objectMapper;
+    private final BusinessMetrics businessMetrics;
 
     public ClienteReferenciaSyncService(
             ClienteReferenciaRepositoryPort clienteReferenciaRepository,
             ProcessedEventRepositoryPort processedEventRepository,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            BusinessMetrics businessMetrics) {
         this.clienteReferenciaRepository = clienteReferenciaRepository;
         this.processedEventRepository = processedEventRepository;
         this.objectMapper = objectMapper;
+        this.businessMetrics = businessMetrics;
     }
 
     @Transactional
     public void processEvent(UUID eventId, String eventType, String payloadJson) {
         if (processedEventRepository.existsByEventId(eventId)) {
             log.debug("Evento ya procesado: eventId={}", eventId);
+            businessMetrics.incrementKafkaEventoDuplicado();
             return;
         }
 
@@ -48,6 +53,7 @@ public class ClienteReferenciaSyncService {
         }
 
         processedEventRepository.markProcessed(eventId);
+        businessMetrics.incrementKafkaEventoProcesado(eventType);
         log.info("Evento procesado: eventId={} eventType={}", eventId, eventType);
     }
 

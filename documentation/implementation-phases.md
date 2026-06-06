@@ -138,10 +138,15 @@ GET `/api/reportes` con fechaDesde, fechaHasta, cliente.
 
 ## F10 - Observabilidad Docker full
 
-Dockerfiles, apps en compose, `/actuator/prometheus`.
+Dockerfiles multi-stage, microservicios en compose, Actuator + Micrometer, scrape Prometheus y dashboard Grafana de negocio.
 
-- [ ] Stack completo `docker compose up`
-- [ ] Grafana :3000
+- [x] `client-service/Dockerfile` y `account-service/Dockerfile` (Java 25, healthcheck readiness)
+- [x] `.dockerignore` + apps en `docker-compose.yml` (postgres, kafka, prometheus, grafana)
+- [x] Actuator: `health`, `info`, `prometheus` en ambos servicios
+- [x] Counters de negocio `devsu.*` via `BusinessMetrics` (client + account)
+- [x] Prometheus scrape jobs `client-service` y `account-service` (`infra/prometheus/prometheus.yml`)
+- [x] Grafana :3000 con dashboard **Devsu - Negocio bancario** provisionado
+- [x] `docker compose up -d --build` — stack operativo; targets Prometheus UP
 
 ---
 
@@ -177,6 +182,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F7 | [x] Completo |
 | F8 | [x] Completo |
 | F9 | [x] Completo |
-| F10-F12 | [ ] Pendiente |
+| F10 | [x] Completo |
+| F11-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*
