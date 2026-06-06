@@ -1,0 +1,29 @@
+{
+  "groups": [
+    {
+      "name": "devsu",
+      "type": "com.devsu.account.infrastructure.config.DevsuProperties",
+      "sourceType": "com.devsu.account.infrastructure.config.DevsuProperties"
+    },
+    {
+      "name": "devsu.kafka",
+      "type": "com.devsu.account.infrastructure.config.DevsuProperties$Kafka",
+      "sourceType": "com.devsu.account.infrastructure.config.DevsuProperties",
+      "sourceMethod": "getKafka()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "devsu.kafka.topic-client-events",
+      "type": "java.lang.String",
+      "description": "Kafka topic for client domain events.",
+      "sourceType": "com.devsu.account.infrastructure.config.DevsuProperties$Kafka"
+    },
+    {
+      "name": "devsu.kafka.consumer-group",
+      "type": "java.lang.String",
+      "description": "Kafka consumer group for client events.",
+      "sourceType": "com.devsu.account.infrastructure.config.DevsuProperties$Kafka"
+    }
+  ]
+}

@@ -102,9 +102,9 @@ Ref: [instructions sec. 2](instructions.md#2-kafka--outbox) | [data-model](data-
 
 KafkaListener, UPSERT `cliente_referencia`, idempotencia `processed_event`.
 
-- [ ] POST :8081 -> fila en `account.cliente_referencia`
-- [ ] DELETE logico -> activo=false
-- [ ] Reprocesar eventId no duplica
+- [x] POST :8081 -> fila en `account.cliente_referencia`
+- [x] DELETE logico -> activo=false
+- [x] Reprocesar eventId no duplica
 
 ---
 
@@ -173,6 +173,7 @@ Postman, OpenAPI, evaluation, repo publico + ZIP/RAR.
 | F3 | [x] Completo |
 | F4 | [x] Completo |
 | F5 | [x] Completo |
-| F6-F12 | [ ] Pendiente |
+| F6 | [x] Completo |
+| F7-F12 | [ ] Pendiente |
 
 *Actualizar al completar cada fase.*

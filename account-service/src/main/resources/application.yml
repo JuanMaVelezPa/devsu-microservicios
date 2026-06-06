@@ -4,3 +4,25 @@ server:
 spring:
   application:
     name: account-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
+    consumer:
+      group-id: ${devsu.kafka.consumer-group:account-service-client-events}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5433}/${POSTGRES_DB:devsu_db}?currentSchema=account
+    username: ${POSTGRES_USER:devsu}
+    password: ${POSTGRES_PASSWORD:devsu_secret}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.default_schema: account
+
+devsu:
+  kafka:
+    topic-client-events: ${KAFKA_TOPIC_CLIENT_EVENTS:devsu.client.events}
+    consumer-group: account-service-client-events
