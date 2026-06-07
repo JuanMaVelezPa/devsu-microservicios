@@ -72,7 +72,7 @@ CREATE TABLE account.cuenta (
 CREATE TABLE account.movimiento (
     id                  BIGSERIAL PRIMARY KEY,
     cuenta_id           BIGINT NOT NULL REFERENCES account.cuenta (id),
-    fecha               DATE NOT NULL DEFAULT CURRENT_DATE,
+    fecha               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     tipo_movimiento     VARCHAR(20) NOT NULL,
     valor               DECIMAL(12, 2) NOT NULL,
     saldo_resultante    DECIMAL(12, 2) NOT NULL,

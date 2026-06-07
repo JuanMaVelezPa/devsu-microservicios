@@ -44,6 +44,7 @@ public class DevsuProperties {
     public static class Outbox {
 
         private long publishIntervalMs = 3000;
+        private int batchSize = 50;
         private boolean publisherEnabled = true;
 
         public long getPublishIntervalMs() {
@@ -52,6 +53,14 @@ public class DevsuProperties {
 
         public void setPublishIntervalMs(long publishIntervalMs) {
             this.publishIntervalMs = publishIntervalMs;
+        }
+
+        public int getBatchSize() {
+            return batchSize;
+        }
+
+        public void setBatchSize(int batchSize) {
+            this.batchSize = batchSize;
         }
 
         public boolean isPublisherEnabled() {

@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +47,7 @@ class MovimientoApplicationServiceTest {
         when(cuentaRepository.findByNumeroCuenta("478758")).thenReturn(Optional.of(cuenta));
 
         assertThatThrownBy(() -> movimientoService.register(
-                new MovimientoCommand("478758", new BigDecimal("-575"), LocalDate.of(2022, 2, 1))))
+                new MovimientoCommand("478758", new BigDecimal("-575"), LocalDateTime.of(2022, 2, 1, 9, 0, 0))))
                 .isInstanceOf(SaldoNoDisponibleException.class)
                 .extracting(ex -> ((SaldoNoDisponibleException) ex).getCode())
                 .isEqualTo("SALDO_NO_DISPONIBLE");
@@ -70,7 +70,7 @@ class MovimientoApplicationServiceTest {
         });
 
         var view = movimientoService.register(
-                new MovimientoCommand("225487", new BigDecimal("600"), LocalDate.of(2022, 2, 10)));
+                new MovimientoCommand("225487", new BigDecimal("600"), LocalDateTime.of(2022, 2, 10, 14, 30, 0)));
 
         assertThat(view.valor()).isEqualByComparingTo("600");
         assertThat(view.tipoMovimiento()).isEqualTo(TipoMovimiento.DEPOSITO);

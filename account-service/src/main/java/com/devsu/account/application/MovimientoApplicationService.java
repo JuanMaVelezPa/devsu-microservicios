@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,7 +52,7 @@ public class MovimientoApplicationService {
         Cuenta cuenta = cuentaRepository.findByNumeroCuenta(command.numeroCuenta())
                 .orElseThrow(CuentaNotFoundException::new);
 
-        LocalDate fecha = command.fecha() != null ? command.fecha() : LocalDate.now();
+        LocalDateTime fecha = command.fecha() != null ? command.fecha() : LocalDateTime.now();
         BigDecimal saldoResultante = cuenta.getSaldo().add(command.valor());
         TipoMovimiento tipoMovimiento = resolveTipoMovimiento(command.valor());
 
@@ -77,7 +77,7 @@ public class MovimientoApplicationService {
 
     @Transactional(readOnly = true)
     public MovimientoPageView list(int page, int size) {
-        PageRequest pageable = PageRequest.of(page, normalizeSize(size), Sort.by("id").ascending());
+        PageRequest pageable = PageRequest.of(page, normalizeSize(size), Sort.by("fecha").ascending().and(Sort.by("id").ascending()));
         Page<Movimiento> result = movimientoRepository.findAll(pageable);
         Map<Long, String> numerosCuenta = resolveNumerosCuenta(result.getContent());
 

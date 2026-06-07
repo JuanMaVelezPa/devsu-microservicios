@@ -1,6 +1,7 @@
 # --- Notas internas (no entregar) ---
 .git-phases.local.md
 *.local.md
+documentation/entrevista-tecnica.md
 
 # --- Secretos y configuracion local ---
 .env

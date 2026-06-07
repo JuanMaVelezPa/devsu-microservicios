@@ -408,7 +408,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"numeroCuenta\": \"478758\",\n  \"valor\": -575,\n  \"fecha\": \"2022-02-01\"\n}"
+                  "raw": "{\n  \"numeroCuenta\": \"478758\",\n  \"valor\": -575,\n  \"fecha\": \"2022-02-01T09:00:00\"\n}"
                 },
                 "url": "{{accountBaseUrl}}/api/movimientos"
               }
@@ -425,7 +425,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"numeroCuenta\": \"225487\",\n  \"valor\": 600,\n  \"fecha\": \"2022-02-10\"\n}"
+                  "raw": "{\n  \"numeroCuenta\": \"225487\",\n  \"valor\": 600,\n  \"fecha\": \"2022-02-10T10:00:00\"\n}"
                 },
                 "url": "{{accountBaseUrl}}/api/movimientos"
               }
@@ -442,7 +442,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"numeroCuenta\": \"495878\",\n  \"valor\": 150,\n  \"fecha\": \"2022-02-05\"\n}"
+                  "raw": "{\n  \"numeroCuenta\": \"495878\",\n  \"valor\": 150,\n  \"fecha\": \"2022-02-05T11:00:00\"\n}"
                 },
                 "url": "{{accountBaseUrl}}/api/movimientos"
               }
@@ -459,7 +459,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"numeroCuenta\": \"496825\",\n  \"valor\": -540,\n  \"fecha\": \"2022-02-08\"\n}"
+                  "raw": "{\n  \"numeroCuenta\": \"496825\",\n  \"valor\": -540,\n  \"fecha\": \"2022-02-08T08:30:00\"\n}"
                 },
                 "url": "{{accountBaseUrl}}/api/movimientos"
               }
@@ -487,14 +487,14 @@
                       "pm.test('cuenta 225487 saldo 700 y deposito 600', () => {",
                       "  pm.expect(c225).to.exist;",
                       "  pm.expect(c225.saldoActual).to.eql(700);",
-                      "  pm.expect(c225.movimientos[0].fecha).to.eql('2022-02-10');",
+                      "  pm.expect(c225.movimientos[0].fecha).to.eql('2022-02-10T10:00:00');",
                       "  pm.expect(c225.movimientos[0].valor).to.eql(600);",
                       "  pm.expect(c225.movimientos[0].saldoResultante).to.eql(700);",
                       "});",
                       "pm.test('cuenta 496825 saldo 0 y retiro 540', () => {",
                       "  pm.expect(c496).to.exist;",
                       "  pm.expect(c496.saldoActual).to.eql(0);",
-                      "  pm.expect(c496.movimientos[0].fecha).to.eql('2022-02-08');",
+                      "  pm.expect(c496.movimientos[0].fecha).to.eql('2022-02-08T08:30:00');",
                       "  pm.expect(c496.movimientos[0].valor).to.eql(-540);",
                       "  pm.expect(c496.movimientos[0].saldoResultante).to.eql(0);",
                       "});"
@@ -732,7 +732,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"numeroCuenta\": \"496825\",\n  \"valor\": -1,\n  \"fecha\": \"2022-02-09\"\n}"
+                  "raw": "{\n  \"numeroCuenta\": \"496825\",\n  \"valor\": -1,\n  \"fecha\": \"2022-02-09T12:00:00\"\n}"
                 },
                 "url": "{{accountBaseUrl}}/api/movimientos"
               }
@@ -749,7 +749,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"numeroCuenta\": \"000000\",\n  \"valor\": 100,\n  \"fecha\": \"2022-02-01\"\n}"
+                  "raw": "{\n  \"numeroCuenta\": \"000000\",\n  \"valor\": 100,\n  \"fecha\": \"2022-02-01T12:00:00\"\n}"
                 },
                 "url": "{{accountBaseUrl}}/api/movimientos"
               }

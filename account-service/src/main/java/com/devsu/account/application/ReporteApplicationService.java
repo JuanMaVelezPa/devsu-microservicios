@@ -15,6 +15,8 @@ import com.devsu.account.infrastructure.observability.BusinessMetrics;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -40,7 +42,7 @@ public class ReporteApplicationService {
     public ReporteView generate(ReporteQuery query) {
         validateQuery(query);
 
-        ClienteReferencia cliente = clienteReferenciaRepository.findByNombreIgnoreCase(query.cliente().trim())
+        ClienteReferencia cliente = clienteReferenciaRepository.findByNombre(query.cliente().trim())
                 .orElseThrow(ClienteNotFoundException::new);
 
         List<CuentaReporteView> cuentas = cuentaRepository.findByClienteIdOrderByIdAsc(cliente.getId()).stream()
@@ -72,9 +74,11 @@ public class ReporteApplicationService {
     }
 
     private CuentaReporteView toCuentaReporteView(Cuenta cuenta, ReporteQuery query) {
+        LocalDateTime desde = query.fechaDesde().atStartOfDay();
+        LocalDateTime hasta = query.fechaHasta().atTime(LocalTime.MAX);
+
         List<MovimientoReporteView> movimientos = movimientoRepository
-                .findByCuentaIdAndFechaBetweenOrderByFechaAscIdAsc(
-                        cuenta.getId(), query.fechaDesde(), query.fechaHasta())
+                .findByCuentaIdAndFechaBetweenOrderByFechaAscIdAsc(cuenta.getId(), desde, hasta)
                 .stream()
                 .map(this::toMovimientoReporteView)
                 .toList();

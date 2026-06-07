@@ -54,7 +54,7 @@ class MovimientoApiTest {
 
     @Test
     void shouldRegisterDepositoAndRetiroUpdatingSaldo() throws Exception {
-        registerMovimiento("478758", -575, "2022-02-01")
+        registerMovimiento("478758", -575, "2022-02-01T09:00:00")
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.tipoMovimiento").value("RETIRO"))
                 .andExpect(jsonPath("$.data.valor").value(-575))
@@ -63,7 +63,7 @@ class MovimientoApiTest {
         assertThat(cuentaRepository.findByNumeroCuenta("478758").orElseThrow().getSaldo())
                 .isEqualByComparingTo(new BigDecimal("1425"));
 
-        registerMovimiento("225487", 600, "2022-02-10")
+        registerMovimiento("225487", 600, "2022-02-10T10:00:00")
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.tipoMovimiento").value("DEPOSITO"))
                 .andExpect(jsonPath("$.data.saldoResultante").value(700));
@@ -75,10 +75,10 @@ class MovimientoApiTest {
 
     @Test
     void shouldExecuteAnexoACaso4Movimientos() throws Exception {
-        registerMovimiento("478758", -575, "2022-02-01").andExpect(status().isCreated());
-        registerMovimiento("225487", 600, "2022-02-10").andExpect(status().isCreated());
-        registerMovimiento("495878", 150, "2022-02-05").andExpect(status().isCreated());
-        registerMovimiento("496825", -540, "2022-02-08").andExpect(status().isCreated());
+        registerMovimiento("478758", -575, "2022-02-01T09:00:00").andExpect(status().isCreated());
+        registerMovimiento("225487", 600, "2022-02-10T10:00:00").andExpect(status().isCreated());
+        registerMovimiento("495878", 150, "2022-02-05T11:00:00").andExpect(status().isCreated());
+        registerMovimiento("496825", -540, "2022-02-08T08:30:00").andExpect(status().isCreated());
 
         assertThat(cuentaRepository.findByNumeroCuenta("478758").orElseThrow().getSaldo())
                 .isEqualByComparingTo(new BigDecimal("1425"));
@@ -98,7 +98,7 @@ class MovimientoApiTest {
     void shouldReturn422WhenSaldoInsuficienteWithoutPersistingMovimiento() throws Exception {
         BigDecimal saldoInicial = cuentaRepository.findByNumeroCuenta("496825").orElseThrow().getSaldo();
 
-        registerMovimiento("496825", -541, "2022-02-08")
+        registerMovimiento("496825", -541, "2022-02-08T08:30:00")
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.error.code").value("SALDO_NO_DISPONIBLE"))
                 .andExpect(jsonPath("$.error.message").value("Saldo no disponible"));
@@ -110,7 +110,7 @@ class MovimientoApiTest {
 
     @Test
     void shouldReturn404WhenCuentaNotFound() throws Exception {
-        registerMovimiento("000000", 100, "2022-02-01")
+        registerMovimiento("000000", 100, "2022-02-01T12:00:00")
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error.code").value("CUENTA_NOT_FOUND"));
     }
@@ -121,7 +121,7 @@ class MovimientoApiTest {
                 {
                   "numeroCuenta": "478758",
                   "valor": 0,
-                  "fecha": "2022-02-01"
+                  "fecha": "2022-02-01T12:00:00"
                 }
                 """;
 

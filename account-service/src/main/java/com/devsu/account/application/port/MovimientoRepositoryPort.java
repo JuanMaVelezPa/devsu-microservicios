@@ -4,7 +4,7 @@ import com.devsu.account.domain.model.Movimiento;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,5 +17,5 @@ public interface MovimientoRepositoryPort {
     Page<Movimiento> findAll(Pageable pageable);
 
     List<Movimiento> findByCuentaIdAndFechaBetweenOrderByFechaAscIdAsc(
-            Long cuentaId, LocalDate fechaDesde, LocalDate fechaHasta);
+            Long cuentaId, LocalDateTime fechaDesde, LocalDateTime fechaHasta);
 }

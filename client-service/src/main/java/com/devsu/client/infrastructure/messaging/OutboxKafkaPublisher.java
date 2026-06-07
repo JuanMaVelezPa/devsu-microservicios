@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 public class OutboxKafkaPublisher {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxKafkaPublisher.class);
-    private static final int BATCH_SIZE = 50;
 
     private final OutboxEventJpaRepository outboxRepository;
     private final OutboxEventMarker outboxEventMarker;
@@ -33,6 +32,7 @@ public class OutboxKafkaPublisher {
     private final ObjectMapper objectMapper;
     private final String topic;
     private final BusinessMetrics businessMetrics;
+    private final int batchSize;
 
     public OutboxKafkaPublisher(
             OutboxEventJpaRepository outboxRepository,
@@ -47,11 +47,12 @@ public class OutboxKafkaPublisher {
         this.objectMapper = objectMapper;
         this.topic = devsuProperties.getKafka().getTopicClientEvents();
         this.businessMetrics = businessMetrics;
+        this.batchSize = devsuProperties.getOutbox().getBatchSize();
     }
 
     @Scheduled(fixedDelayString = "${devsu.outbox.publish-interval-ms:3000}")
     public void publishPendingEvents() {
-        List<OutboxEvent> pending = outboxRepository.findPendingEvents(PageRequest.of(0, BATCH_SIZE));
+        List<OutboxEvent> pending = outboxRepository.findPendingEvents(PageRequest.of(0, batchSize));
         for (OutboxEvent event : pending) {
             publishSingle(event);
         }

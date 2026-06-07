@@ -76,7 +76,7 @@ Estructura repo: monorepo Maven, `client-service/`, `account-service/`, `docker-
 ## 2. Kafka + Outbox
 
 - account-service **no llama** REST a client-service al crear cuenta.
-- Misma TX: INSERT cliente + INSERT `outbox_event`. Publisher `@Scheduled(3s)` publica pendientes (`published_at IS NULL`).
+- Misma TX: INSERT cliente + INSERT `outbox_event`. Publisher `@Scheduled` (intervalo configurable, default 3 s) publica pendientes (`published_at IS NULL`).
 - **Topic:** `devsu.client.events` | **Headers:** `correlationId`, `eventType`, `eventId`
 - **Idempotencia:** tabla `processed_event` en account-service.
 
@@ -86,7 +86,7 @@ Estructura repo: monorepo Maven, `client-service/`, `account-service/`, `docker-
 | ClienteActualizado | PUT /clientes | id, nombre, identificacion, activo |
 | ClienteEliminado | DELETE /clientes | id |
 
-Payload detallado: [data-model.md](data-model.md). `activo` en payload = `cliente.estado`.
+Payload detallado: [data-model.md](data-model.md). `activo` en payload = `cliente.estado`. **PUT** y baja logica (**DELETE**) propagan cambios de `activo` a `cliente_referencia` via `ClienteActualizado` / `ClienteEliminado`.
 
 Kafka **no** interviene en movimientos ni reportes (solo datos locales en account-service).
 
@@ -162,7 +162,7 @@ Componentes por servicio (sin modulo shared): `CorrelationIdFilter`, `Correlatio
 
 ## 5. DTOs y recursos
 
-Convenciones: IDs `number` (Long); `numeroCuenta` string; fechas `yyyy-MM-dd`; enums `AHORROS|CORRIENTE|ACTIVA|INACTIVA|DEPOSITO|RETIRO`. DELETE cliente = baja logica (`estado=false`, HTTP 200). Mapeo API->BD: [data-model.md](data-model.md).
+Convenciones: IDs `number` (Long); `numeroCuenta` string; fechas reporte `yyyy-MM-dd`; movimientos `yyyy-MM-dd'T'HH:mm:ss`; enums `AHORROS|CORRIENTE|ACTIVA|INACTIVA|DEPOSITO|RETIRO`. DELETE cliente = baja logica (`estado=false`, HTTP 200). Mapeo API->BD: [data-model.md](data-model.md).
 
 ### Clientes (`/api/clientes`)
 
@@ -194,17 +194,17 @@ Errores POST: 422 CLIENTE_NOT_FOUND / CLIENTE_INACTIVO; 409 CUENTA_DUPLICADA.
 
 ### Movimientos (`/api/movimientos`)
 
-**MovimientoRequest:** numeroCuenta*, valor* (positivo=deposito, negativo=retiro, !=0), fecha (default hoy).
+**MovimientoRequest:** numeroCuenta*, valor* (positivo=deposito, negativo=retiro, !=0), fecha (datetime ISO-8601; default ahora). Orden en reportes/listados: `fecha ASC, id ASC`.
 
-**MovimientoResponse:** id, cuentaId, numeroCuenta, fecha, tipoMovimiento, valor, saldoResultante.
+**MovimientoResponse:** id, cuentaId, numeroCuenta, fecha (datetime), tipoMovimiento, valor, saldoResultante.
 
-Ejemplo retiro Caso 4: `{ "numeroCuenta": "478758", "valor": -575, "fecha": "2022-02-01" }`
+Ejemplo retiro Caso 4: `{ "numeroCuenta": "478758", "valor": -575, "fecha": "2022-02-01T09:00:00" }`
 
 ### Reportes (`/api/reportes`)
 
-Query: fechaDesde*, fechaHasta* (inclusive), cliente* (nombre exacto, case-insensitive).
+Query: fechaDesde*, fechaHasta* (inclusive, por dia calendario), cliente* (nombre **exacto**, case-sensitive; trim espacios).
 
-**ReporteResponse:** cliente, fechaDesde, fechaHasta, cuentas[] { numeroCuenta, saldoActual, movimientos[] { fecha, valor, saldoResultante } }.
+**ReporteResponse:** cliente, fechaDesde, fechaHasta, cuentas[] { numeroCuenta, saldoActual, movimientos[] { fecha, valor, saldoResultante } } (movimientos ordenados cronologicamente).
 
 Todas las cuentas del cliente; movimientos filtrados por rango. Cliente inexistente -> 404 CLIENTE_NOT_FOUND.
 
@@ -234,6 +234,67 @@ Ejemplo Caso 5: `GET /api/reportes?fechaDesde=2022-02-01&fechaHasta=2022-02-28&c
 ### Flujo de prueba (Casos 1-5)
 
 Guia detallada: [validacion-prueba.md](validacion-prueba.md)
+
+---
+
+## 7. Produccion y evolucion
+
+Fuera del alcance del reto; documentado para entrevista y evolucion del sistema. Resumen en [README.md](../README.md#evolucion-futura-fuera-de-alcance-del-reto).
+
+### Resiliencia actual (implementada)
+
+| Mecanismo | Proposito |
+|---|---|
+| Transactional Outbox | Cliente y evento en la misma TX; Kafka puede caer sin perder datos |
+| Publisher `@Scheduled` | Reintenta publicacion de eventos pendientes (intervalo: `OUTBOX_PUBLISH_INTERVAL_MS`, default 3000) |
+| `processed_event` | Idempotencia en account-service al reprocesar |
+| `correlationId` end-to-end | Trazabilidad HTTP → outbox → Kafka → consumer → logs |
+| Docker `restart: unless-stopped` | Reinicio automatico de contenedores tras fallo o reinicio del host |
+| Healthchecks Compose + Actuator | Readiness en MS; `depends_on: service_healthy` en postgres/kafka |
+
+### Escalabilidad
+
+- **HTTP:** escalar `client-service` y `account-service` horizontalmente detras de un balanceador (stateless en API; estado en PostgreSQL).
+- **Kafka:** aumentar particiones del topic `devsu.client.events` y replicas del consumer group (`account-service-client-events`).
+- **Outbox:** con N instancias de client-service, coordinar publicacion (una instancia leader, o `@Scheduled` con bloqueo optimista por fila) para evitar duplicados en Kafka.
+- **PostgreSQL:** connection pool (Hikari), indices existentes en `BaseDatos.sql`; read replicas si el reporte domina la lectura.
+
+Para la carga del reto (Casos 1-5, demo Postman), una replica por servicio es suficiente.
+
+### Kafka y backpressure
+
+Configuracion actual (ver `.env.example`):
+
+| Variable | Servicio | Default | Que controla |
+|---|---|---|---|
+| `OUTBOX_PUBLISH_INTERVAL_MS` | client | 3000 | Cada cuantos ms corre el publisher (ej. 1000 = 1 s) |
+| `OUTBOX_BATCH_SIZE` | client | 50 | Max eventos outbox publicados **por ciclo** |
+| `KAFKA_CONSUMER_MAX_POLL_RECORDS` | account | 500 | Max mensajes que el consumer trae por poll (Spring/Kafka default) |
+
+**Si Kafka cae (publisher):** el evento queda en `outbox_event` con `published_at` NULL; al fallar `kafkaTemplate.send()` se loguea error y **no** se marca publicado. El siguiente ciclo del scheduler reintenta. La API ya respondio 201 al cliente (outbox desacopla).
+
+**Si Kafka cae (consumer):** account-service deja de recibir; los mensajes quedan en el topic hasta que vuelva Kafka y el listener reconecte. Con consumer apagado y Kafka arriba, crece el **lag** del consumer group; al reiniciar, procesa desde el offset (idempotencia en `processed_event`).
+
+**Backpressure en este proyecto:** no hay throttle explicito en codigo; el outbox limita **50 eventos/ciclo** y el intervalo entre ciclos. El consumer procesa **1 mensaje por invocacion** del `@KafkaListener` (no batch listener). Para produccion: DLQ, retry backoff y tuning de `max.poll.records` / concurrencia — ver [README evolucion futura](../README.md#evolucion-futura-fuera-de-alcance-del-reto).
+
+Codigo: `OutboxKafkaPublisher.java` (publisher), `ClienteEventConsumer.java` (consumer), `application.yml` de cada servicio.
+
+El Outbox ya actua como buffer entre la API y Kafka: picos de escritura no bloquean la respuesta HTTP.
+
+### Alertas operativas
+
+Stack actual: Prometheus scrape + Grafana dashboard. **No** hay Alertmanager ni webhooks.
+
+Evolucion tipica:
+
+1. Regla: target `down` o `devsu_movimiento_rechazo_total` anomalo.
+2. Alertmanager o Grafana Alerting → webhook Discord/Slack/PagerDuty.
+3. Separar **recuperacion** (Docker restart) de **notificacion** (alerta si el servicio sigue caido tras X minutos).
+
+### Optimizaciones opcionales
+
+- **Virtual threads (Java 21+):** util si el cuello de botella es espera I/O en muchas peticiones concurrentes; medir antes de activar (`spring.threads.virtual.enabled=true`).
+- **E2E automatizado:** Testcontainers levantando Postgres + Kafka en CI, complementando MockMvc/H2 y Postman manual.
 
 ---
 
@@ -292,14 +353,14 @@ Ejemplo respuesta Caso 5 (fragmento `data`):
       "numeroCuenta": "225487",
       "saldoActual": 700,
       "movimientos": [
-        { "fecha": "2022-02-10", "valor": 600, "saldoResultante": 700 }
+        { "fecha": "2022-02-10T10:00:00", "valor": 600, "saldoResultante": 700 }
       ]
     },
     {
       "numeroCuenta": "496825",
       "saldoActual": 0,
       "movimientos": [
-        { "fecha": "2022-02-08", "valor": -540, "saldoResultante": 0 }
+        { "fecha": "2022-02-08T08:30:00", "valor": -540, "saldoResultante": 0 }
       ]
     }
   ]
@@ -310,4 +371,4 @@ Cuentas del cliente sin movimientos en el rango aparecen con `movimientos: []`.
 
 ---
 
-*Documento vivo v3.9. Roadmap: [implementation-phases.md](implementation-phases.md)*
+*Documento vivo v4.0. Roadmap: [implementation-phases.md](implementation-phases.md)*

@@ -11,7 +11,6 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,7 +25,7 @@ public class Movimiento {
     private Long cuentaId;
 
     @Column(nullable = false)
-    private LocalDate fecha;
+    private LocalDateTime fecha;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_movimiento", nullable = false, length = 20)
@@ -65,11 +64,11 @@ public class Movimiento {
         this.cuentaId = cuentaId;
     }
 
-    public LocalDate getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

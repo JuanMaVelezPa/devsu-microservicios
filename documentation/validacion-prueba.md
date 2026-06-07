@@ -54,8 +54,10 @@ Ejecutar **en orden**. Tras el paso 2, esperar **~5 segundos** (outbox publica c
 
 | Cuenta | Saldo actual | Movimiento |
 |---|---|---|
-| 225487 | 700 | +600 el 2022-02-10 |
-| 496825 | 0 | -540 el 2022-02-08 |
+| 225487 | 700 | +600 el 2022-02-10T10:00:00 |
+| 496825 | 0 | -540 el 2022-02-08T08:30:00 |
+
+Los movimientos usan **fecha y hora** (`TIMESTAMP`) para orden cronologico cuando hay mas de uno el mismo dia.
 
 ---
 
@@ -72,7 +74,20 @@ docker exec -it devsu-postgres psql -U devsu -d devsu_db
 Consultas utiles (copiar/pegar):
 
 ```sql
+
+-- Todas las tablas (schemas client + account)
+\dt client.*
+\dt account.*
+
+-- O en una sola consulta SQL
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema IN ('client', 'account')
+ORDER BY table_schema, table_name;
+
 -- Outbox: eventos pendientes o ya publicados a Kafka
+-- publicado = false  -> aun NO enviado a Kafka (published_at IS NULL)
+-- publicado = true   -> ya publicado por el Outbox publisher
 SELECT id, event_type, aggregate_id, published_at IS NOT NULL AS publicado, created_at
 FROM client.outbox_event
 ORDER BY created_at;
@@ -86,11 +101,55 @@ ORDER BY id;
 SELECT event_id, processed_at FROM account.processed_event ORDER BY processed_at;
 ```
 
+Salir de psql: `\q`
+
 Tras el **paso 1** del flujo: filas en `outbox_event` con `publicado = true` y 3 filas en `cliente_referencia` con los mismos IDs.
+
+### Outbox y Kafka — variables utiles
+
+En `.env` (ver `.env.example`):
+
+| Variable | Default | Uso |
+|---|---|---|
+| `OUTBOX_PUBLISH_INTERVAL_MS` | 3000 | Intervalo del publisher (1000 = 1 s entre ciclos) |
+| `OUTBOX_BATCH_SIZE` | 50 | Eventos max publicados por ciclo |
+| `KAFKA_CONSUMER_MAX_POLL_RECORDS` | 500 | Lote max del consumer account-service |
+
+Tras cambiar valores: `docker compose up -d --build client-service account-service`
+
+**Kafka caido:** eventos quedan en outbox (`publicado = false`) hasta que Kafka vuelva; el cron reintenta. El consumer no actualiza `cliente_referencia` hasta que pueda leer del topic.
+
+### Preguntas frecuentes (async)
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿`publicado = false` en outbox? | Si. El evento esta en BD pero el publisher aun no lo envio a Kafka. Tras ~3 s deberia pasar a `true`. |
+| ¿PUT cliente (estado/datos) llega a account? | Si. `ClienteActualizado` via outbox → Kafka → UPSERT en `cliente_referencia` (incluye `activo`). |
+| ¿DELETE logico cliente? | Si. `ClienteEliminado` → `activo = false` en `cliente_referencia`. |
 
 ---
 
-## 5. Casos opcionales (errores)
+## 5. Codigos de error (API)
+
+Todos los `error.code` del envelope usan **MAYUSCULAS** con guion bajo:
+
+| Codigo | HTTP | Servicio |
+|---|---|---|
+| CLIENTE_DUPLICADO | 409 | client |
+| CLIENTE_NOT_FOUND | 404 | client / account |
+| CUENTA_DUPLICADA | 409 | account |
+| CUENTA_NOT_FOUND | 404 | account |
+| MOVIMIENTO_NOT_FOUND | 404 | account |
+| CLIENTE_INACTIVO | 422 | account |
+| SALDO_NO_DISPONIBLE | 422 | account (F3) |
+| VALIDATION_ERROR | 400 | ambos |
+| INTERNAL_ERROR | 500 | ambos |
+
+Reportes: parametro `cliente` es **case-sensitive** (debe coincidir con el nombre en `cliente_referencia`); se aplican **trim** de espacios al inicio/fin.
+
+---
+
+## 6. Casos opcionales (errores)
 
 | Carpeta Postman | Que demuestra |
 |---|---|
@@ -99,7 +158,7 @@ Tras el **paso 1** del flujo: filas en `outbox_event` con `publicado = true` y 3
 
 ---
 
-## 6. Observabilidad (opcional)
+## 7. Observabilidad (opcional)
 
 | Recurso | URL |
 |---|---|
@@ -107,6 +166,8 @@ Tras el **paso 1** del flujo: filas en `outbox_event` con `publicado = true` y 3
 | Swagger account | http://localhost:8082/swagger-ui.html |
 | Prometheus targets | http://localhost:9090/targets |
 | Grafana | http://localhost:3000 (admin/admin) |
+
+Contacto del autor en Swagger UI (bloque **Contact**, separado de la descripcion tecnica del servicio).
 
 ---
 

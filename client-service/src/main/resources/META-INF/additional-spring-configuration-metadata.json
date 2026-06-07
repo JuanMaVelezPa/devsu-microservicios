@@ -28,7 +28,13 @@
     {
       "name": "devsu.outbox.publish-interval-ms",
       "type": "java.lang.Long",
-      "description": "Outbox publisher fixed delay in milliseconds.",
+      "description": "Outbox publisher fixed delay in milliseconds. Env: OUTBOX_PUBLISH_INTERVAL_MS.",
+      "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties$Outbox"
+    },
+    {
+      "name": "devsu.outbox.batch-size",
+      "type": "java.lang.Integer",
+      "description": "Max pending outbox events published per scheduler cycle. Env: OUTBOX_BATCH_SIZE.",
       "sourceType": "com.devsu.client.infrastructure.config.DevsuProperties$Outbox"
     },
     {

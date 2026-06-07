@@ -58,6 +58,14 @@ class ClienteReferenciaSyncServiceTest {
         assertThat(clienteReferenciaRepository.findById(901L).orElseThrow().getNombre())
                 .isEqualTo("Jose Lema Actualizado");
 
+        UUID deactivateEventId = UUID.randomUUID();
+        String deactivatePayload = """
+                {"id":901,"nombre":"Jose Lema","identificacion":"1234567890","activo":false}
+                """;
+        syncService.processEvent(deactivateEventId, ClienteEventType.ACTUALIZADO, deactivatePayload);
+
+        assertThat(clienteReferenciaRepository.findById(901L).orElseThrow().isActivo()).isFalse();
+
         UUID deletedEventId = UUID.randomUUID();
         syncService.processEvent(deletedEventId, ClienteEventType.ELIMINADO, "{\"id\":901}");
 

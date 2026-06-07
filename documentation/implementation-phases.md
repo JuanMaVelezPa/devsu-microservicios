@@ -164,11 +164,14 @@ JUnit 5 + Mockito (unitarias) e integracion con H2 + spring-kafka-test.
 
 ## F12 - Entrega final
 
-Postman, OpenAPI, guia validacion, evaluation, repo publico + ZIP/RAR.
+Postman, OpenAPI, guia validacion, evaluation, resiliencia Docker, doc evolucion, repo publico + ZIP/RAR.
 
-- [x] Guia validacion [validacion-prueba.md](validacion-prueba.md)
-- [ ] Flujo Casos 1-5 reproducible (Postman)
-- [ ] Sin secretos en repo
+- [x] Guia validacion [validacion-prueba.md](validacion-prueba.md) + [queries-verificacion-async.sql](queries-verificacion-async.sql)
+- [x] README evolucion futura + [instructions sec. 7](instructions.md#7-produccion-y-evolucion)
+- [x] Docker Compose: `restart: unless-stopped` + healthchecks MS en Compose
+- [x] Postman Casos 1-5 + OpenAPI en ambos servicios
+- [x] Sin secretos en repo (`.env` gitignored)
+- [x] Flujo Casos 1-5 reproducible (Postman manual)
 - [ ] ZIP/RAR generado
 
 ---
@@ -189,6 +192,6 @@ Postman, OpenAPI, guia validacion, evaluation, repo publico + ZIP/RAR.
 | F9 | [x] Completo |
 | F10 | [x] Completo |
 | F11 | [x] Completo |
-| F12 | [ ] Pendiente |
+| F12 | [x] Completo *(ZIP local opcional, no versionado)* |
 
 *Actualizar al completar cada fase.*

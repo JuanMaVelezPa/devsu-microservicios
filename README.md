@@ -7,7 +7,7 @@ Prueba tecnica Devsu: dos microservicios con API REST, persistencia JPA, comunic
 | **Autor** | Juan Manuel Velez Parra |
 | **Correo** | juanmavelezpa@gmail.com |
 | **LinkedIn** | [linkedin.com/in/juanmavelezdev](https://www.linkedin.com/in/juanmavelezdev/) |
-| **Estado** | F11 completada (tests). Siguiente: F12 entrega. |
+| **Estado** | F12 completada. Entrega: commit final, ZIP y push. |
 
 ---
 
@@ -157,6 +157,25 @@ Metricas de negocio `devsu_*` (clientes, outbox, cuentas, movimientos, rechazos 
 | Dashboard Grafana | http://localhost:3000 → carpeta **Devsu** |
 
 Config: `infra/prometheus/prometheus.yml`
+
+**Resiliencia Docker (F12):** todos los servicios usan `restart: unless-stopped`. Los microservicios exponen healthcheck de readiness en Compose (`/actuator/health/readiness`); si un contenedor falla, Docker lo reinicia automaticamente. Las alertas a operadores (p. ej. Discord) quedan como evolucion futura — ver abajo.
+
+---
+
+## Evolucion futura (fuera de alcance del reto)
+
+Decisiones documentadas para produccion; no implementadas en codigo para mantener el alcance de la prueba tecnica. Detalle en [instructions.md — seccion 7](documentation/instructions.md#7-produccion-y-evolucion).
+
+| Area | Mejora posible |
+|---|---|
+| **Alertas** | Grafana Alerting o Prometheus Alertmanager → webhook Discord/Slack cuando un target cae o sube la tasa de errores |
+| **Kafka** | Tuning consumer (`max.poll`, concurrencia), DLQ, retry con backoff; cluster multi-broker en produccion |
+| **Escalabilidad** | Replicas horizontales de MS detras de balanceador; particiones Kafka alineadas al numero de consumidores |
+| **Carga HTTP** | Virtual threads (`spring.threads.virtual.enabled=true`) si el perfil es I/O bound y hay metricas que lo justifiquen |
+| **Pruebas E2E** | Testcontainers con stack Docker completo (Postgres + Kafka real) ademas de Postman manual |
+| **Outbox** | Leader election o job dedicado si hay multiples instancias de client-service publicando |
+
+El **Transactional Outbox**, la **idempotencia** del consumer y la **trazabilidad con correlationId** ya cubren resiliencia basica del flujo async.
 
 ---
 

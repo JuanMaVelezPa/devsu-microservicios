@@ -9,6 +9,7 @@ spring:
     consumer:
       group-id: ${devsu.kafka.consumer-group:account-service-client-events}
       auto-offset-reset: earliest
+      max-poll-records: ${KAFKA_CONSUMER_MAX_POLL_RECORDS:500}
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   datasource:

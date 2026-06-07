@@ -40,7 +40,7 @@ erDiagram
 
 ## Schema `client`
 
-### `persona` ù raiz JPA JOINED
+### `persona` ÔøΩ raiz JPA JOINED
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -53,7 +53,7 @@ erDiagram
 | telefono | VARCHAR(20) | SI | |
 | created_at / updated_at | TIMESTAMP | NO | DEFAULT CURRENT_TIMESTAMP |
 
-### `cliente` ù extension JOINED (misma PK)
+### `cliente` ÔøΩ extension JOINED (misma PK)
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -61,7 +61,7 @@ erDiagram
 | contrasena | VARCHAR(255) | NO | Hash BCrypt (ADR-15) |
 | estado | BOOLEAN | NO | DEFAULT TRUE; FALSE = baja logica |
 
-### `outbox_event` ù Transactional Outbox
+### `outbox_event` ÔøΩ Transactional Outbox
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
@@ -104,13 +104,13 @@ Regla: crear cuenta exige `activo=true`.
 | estado | VARCHAR(20) | NO | DEFAULT ACTIVA; CHECK ACTIVA, INACTIVA |
 | created_at / updated_at | TIMESTAMP | NO | |
 
-### `movimiento` ù inmutable (sin UPDATE API)
+### `movimiento` ÔøΩ inmutable (sin UPDATE API)
 
 | Columna | Tipo | Null | Restricciones |
 |---|---|---|---|
 | id | BIGSERIAL | NO | PK |
 | cuenta_id | BIGINT | NO | FK -> cuenta |
-| fecha | DATE | NO | DEFAULT CURRENT_DATE |
+| fecha | TIMESTAMP | NO | DEFAULT CURRENT_TIMESTAMP; orden cronologico |
 | tipo_movimiento | VARCHAR(20) | NO | CHECK DEPOSITO, RETIRO |
 | valor | DECIMAL(12,2) | NO | CHECK <> 0; signo define tipo |
 | saldo_resultante | DECIMAL(12,2) | NO | CHECK >= 0 |
@@ -118,7 +118,7 @@ Regla: crear cuenta exige `activo=true`.
 
 Indice: `idx_movimiento_cuenta_fecha` (cuenta_id, fecha). Retiro con |valor| > saldo -> F3 sin INSERT.
 
-### `processed_event` ù idempotencia consumer
+### `processed_event` ÔøΩ idempotencia consumer
 
 | Columna | Tipo | Null |
 |---|---|---|
@@ -157,4 +157,4 @@ Consumer: Creado/Actualizado -> UPSERT `cliente_referencia`; Eliminado -> `activ
 
 ---
 
-*v1.3 ù Cambios estructurales requieren nuevo ADR en instructions.md.*
+*v1.3 ÔøΩ Cambios estructurales requieren nuevo ADR en instructions.md.*

@@ -1,10 +1,10 @@
 package com.devsu.account.application.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record MovimientoReporteView(
-        LocalDate fecha,
+        LocalDateTime fecha,
         BigDecimal valor,
         BigDecimal saldoResultante
 ) {

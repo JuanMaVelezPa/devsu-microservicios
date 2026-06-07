@@ -33,8 +33,9 @@ public class ReporteController {
     @Operation(
             summary = "Generar reporte de cuentas",
             description = """
-                    Devuelve las cuentas del cliente cuyo nombre coincide (case-insensitive, contains),
-                    con movimientos en el rango [fechaDesde, fechaHasta] y saldo actual.
+                    Devuelve las cuentas del cliente cuyo nombre coincide exactamente (case-sensitive; trim espacios),
+                    con movimientos en el rango [fechaDesde, fechaHasta] ordenados cronologicamente,
+                    y saldo actual.
                     Caso 5 Anexo A: cliente=Marianela Montalvo, feb-2022 -> cuentas 225487 (saldo 700) y 496825 (saldo 0).
                     """)
     @ApiResponses({
@@ -47,7 +48,7 @@ public class ReporteController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
             @Parameter(description = "Fin del rango (inclusive)", example = "2022-02-28", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta,
-            @Parameter(description = "Nombre o fragmento del cliente", example = "Marianela Montalvo", required = true)
+            @Parameter(description = "Nombre exacto del cliente (case-sensitive; espacios al inicio/fin se ignoran)", example = "Marianela Montalvo", required = true)
             @RequestParam String cliente) {
         ReporteResponse response = ReporteApiMapper.toResponse(
                 reporteService.generate(new ReporteQuery(fechaDesde, fechaHasta, cliente)));

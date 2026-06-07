@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -70,26 +70,33 @@ class ReporteApiTest {
                 .andExpect(jsonPath("$.data.cuentas[0].numeroCuenta").value("225487"))
                 .andExpect(jsonPath("$.data.cuentas[0].saldoActual").value(700))
                 .andExpect(jsonPath("$.data.cuentas[0].movimientos", hasSize(1)))
-                .andExpect(jsonPath("$.data.cuentas[0].movimientos[0].fecha").value("2022-02-10"))
+                .andExpect(jsonPath("$.data.cuentas[0].movimientos[0].fecha").value("2022-02-10T10:00:00"))
                 .andExpect(jsonPath("$.data.cuentas[0].movimientos[0].valor").value(600))
                 .andExpect(jsonPath("$.data.cuentas[0].movimientos[0].saldoResultante").value(700))
                 .andExpect(jsonPath("$.data.cuentas[1].numeroCuenta").value("496825"))
                 .andExpect(jsonPath("$.data.cuentas[1].saldoActual").value(0))
                 .andExpect(jsonPath("$.data.cuentas[1].movimientos", hasSize(1)))
-                .andExpect(jsonPath("$.data.cuentas[1].movimientos[0].fecha").value("2022-02-08"))
+                .andExpect(jsonPath("$.data.cuentas[1].movimientos[0].fecha").value("2022-02-08T08:30:00"))
                 .andExpect(jsonPath("$.data.cuentas[1].movimientos[0].valor").value(-540))
                 .andExpect(jsonPath("$.data.cuentas[1].movimientos[0].saldoResultante").value(0));
     }
 
     @Test
-    void shouldFindClienteByNameCaseInsensitive() throws Exception {
+    void shouldTrimClienteNameAndRequireExactCase() throws Exception {
+        mockMvc.perform(get("/api/reportes")
+                        .param("fechaDesde", "2022-02-01")
+                        .param("fechaHasta", "2022-02-28")
+                        .param("cliente", "  Marianela Montalvo  "))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.cliente").value("Marianela Montalvo"))
+                .andExpect(jsonPath("$.data.cuentas", hasSize(2)));
+
         mockMvc.perform(get("/api/reportes")
                         .param("fechaDesde", "2022-02-01")
                         .param("fechaHasta", "2022-02-28")
                         .param("cliente", "marianela montalvo"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.cliente").value("Marianela Montalvo"))
-                .andExpect(jsonPath("$.data.cuentas", hasSize(2)));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error.code").value("CLIENTE_NOT_FOUND"));
     }
 
     @Test
@@ -150,10 +157,10 @@ class ReporteApiTest {
     }
 
     private void seedAnexoAMovimientos() {
-        saveMovimiento("478758", LocalDate.of(2022, 2, 1), TipoMovimiento.RETIRO, new BigDecimal("-575"), new BigDecimal("1425"));
-        saveMovimiento("225487", LocalDate.of(2022, 2, 10), TipoMovimiento.DEPOSITO, new BigDecimal("600"), new BigDecimal("700"));
-        saveMovimiento("495878", LocalDate.of(2022, 2, 5), TipoMovimiento.DEPOSITO, new BigDecimal("150"), new BigDecimal("150"));
-        saveMovimiento("496825", LocalDate.of(2022, 2, 8), TipoMovimiento.RETIRO, new BigDecimal("-540"), BigDecimal.ZERO);
+        saveMovimiento("478758", LocalDateTime.of(2022, 2, 1, 9, 0, 0), TipoMovimiento.RETIRO, new BigDecimal("-575"), new BigDecimal("1425"));
+        saveMovimiento("225487", LocalDateTime.of(2022, 2, 10, 10, 0, 0), TipoMovimiento.DEPOSITO, new BigDecimal("600"), new BigDecimal("700"));
+        saveMovimiento("495878", LocalDateTime.of(2022, 2, 5, 11, 0, 0), TipoMovimiento.DEPOSITO, new BigDecimal("150"), new BigDecimal("150"));
+        saveMovimiento("496825", LocalDateTime.of(2022, 2, 8, 8, 30, 0), TipoMovimiento.RETIRO, new BigDecimal("-540"), BigDecimal.ZERO);
     }
 
     private void createClienteViaApi() throws Exception {
@@ -171,10 +178,10 @@ class ReporteApiTest {
     }
 
     private void createMovimientosViaApi() throws Exception {
-        registerMovimiento("478758", -575, "2022-02-01");
-        registerMovimiento("225487", 600, "2022-02-10");
-        registerMovimiento("495878", 150, "2022-02-05");
-        registerMovimiento("496825", -540, "2022-02-08");
+        registerMovimiento("478758", -575, "2022-02-01T09:00:00");
+        registerMovimiento("225487", 600, "2022-02-10T10:00:00");
+        registerMovimiento("495878", 150, "2022-02-05T11:00:00");
+        registerMovimiento("496825", -540, "2022-02-08T08:30:00");
     }
 
     private void createCuenta(long clienteId, String numeroCuenta, String tipoCuenta, int saldoInicial)
@@ -226,7 +233,7 @@ class ReporteApiTest {
 
     private void saveMovimiento(
             String numeroCuenta,
-            LocalDate fecha,
+            LocalDateTime fecha,
             TipoMovimiento tipoMovimiento,
             BigDecimal valor,
             BigDecimal saldoResultante) {

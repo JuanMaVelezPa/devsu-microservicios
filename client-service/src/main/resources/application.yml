@@ -24,7 +24,8 @@ devsu:
   kafka:
     topic-client-events: ${KAFKA_TOPIC_CLIENT_EVENTS:devsu.client.events}
   outbox:
-    publish-interval-ms: 3000
+    publish-interval-ms: ${OUTBOX_PUBLISH_INTERVAL_MS:3000}
+    batch-size: ${OUTBOX_BATCH_SIZE:50}
 
 springdoc:
   swagger-ui:

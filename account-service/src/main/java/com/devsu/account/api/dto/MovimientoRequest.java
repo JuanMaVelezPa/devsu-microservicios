@@ -1,11 +1,12 @@
 package com.devsu.account.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "Registro de un movimiento (deposito o retiro)")
 public record MovimientoRequest(
@@ -13,7 +14,8 @@ public record MovimientoRequest(
         @NotBlank String numeroCuenta,
         @Schema(description = "Valor positivo = deposito, negativo = retiro", example = "-575")
         @NotNull BigDecimal valor,
-        @Schema(description = "Fecha contable (ISO-8601). Si se omite, usa la fecha actual.", example = "2022-02-01")
-        LocalDate fecha
+        @Schema(description = "Fecha y hora del movimiento (ISO-8601). Si se omite, usa el instante actual.", example = "2022-02-01T09:15:30")
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        LocalDateTime fecha
 ) {
 }
